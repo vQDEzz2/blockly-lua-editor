@@ -1,30 +1,57 @@
-<xml id="toolbox" style="display: none">
-  <category name="Roblox" colour="230">
-    <block type="create_part"></block>
-    <block type="set_property"></block>
-    <block type="set_material"></block>
-    <block type="move_part"></block>
-    <block type="play_sound"></block>
-    <block type="set_parent"></block>
-    <block type="destroy_object"></block>
-    <block type="on_touch"></block>
-  </category>
-  <category name="Control" colour="160">
-    <block type="controls_if"></block>
-    <block type="controls_repeat_ext"></block>
-    <block type="wait"></block>
-  </category>
-  <category name="Logic" colour="%{BKY_LOGIC_HUE}">
-    <!-- Add logic blocks -->
-  </category>
-  <category name="Math" colour="%{BKY_MATH_HUE}">
-    <!-- Add math blocks -->
-  </category>
-  <category name="Text" colour="%{BKY_TEXTS_HUE}">
-    <!-- Add text blocks -->
-  </category>
-  <category name="Variables" custom="VARIABLE" colour="%{BKY_VARIABLES_HUE}">
-  </category>
-  <category name="Functions" custom="PROCEDURE" colour="%{BKY_PROCEDURES_HUE}">
-  </category>
-</xml>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Blockly Lua Editor for Roblox Studio</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Include Blockly's CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/blockly/media/blockly.min.css" />
+  <!-- Include Blockly's JavaScript -->
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+  <script src="https://unpkg.com/blockly/lua.min.js"></script>
+</head>
+<body>
+  <h1>Blockly Lua Editor for Roblox Studio</h1>
+  <div id="blocklyDiv"></div>
+  <h2>Generated Lua Code:</h2>
+  <pre id="code"></pre>
+  <!-- Define the toolbox -->
+  <xml id="toolbox" style="display: none">
+    <category name="Roblox" colour="230">
+      <block type="create_part"></block>
+      <block type="set_property"></block>
+      <block type="set_material"></block>
+      <block type="move_part"></block>
+      <block type="play_sound"></block>
+      <block type="set_parent"></block>
+      <block type="destroy_object"></block>
+      <block type="on_touch"></block>
+    </category>
+    <category name="Control" colour="160">
+      <block type="controls_if"></block>
+      <block type="controls_repeat_ext"></block>
+      <block type="wait"></block>
+    </category>
+    <category name="Logic" colour="%{BKY_LOGIC_HUE}">
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+    </category>
+    <category name="Math" colour="%{BKY_MATH_HUE}">
+      <block type="math_number"></block>
+      <block type="math_arithmetic"></block>
+    </category>
+    <category name="Text" colour="%{BKY_TEXTS_HUE}">
+      <block type="text"></block>
+      <block type="text_join"></block>
+    </category>
+    <category name="Variables" custom="VARIABLE" colour="%{BKY_VARIABLES_HUE}">
+    </category>
+    <category name="Functions" custom="PROCEDURE" colour="%{BKY_PROCEDURES_HUE}">
+    </category>
+  </xml>
+  <!-- Include your main JavaScript file -->
+  <script src="main.js"></script>
+</body>
+</html>
