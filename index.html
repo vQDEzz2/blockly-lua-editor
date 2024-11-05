@@ -2,21 +2,34 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Blockly Lua Editor</title>
+  <title>Blockly Lua Game Engine Editor</title>
   <link rel="stylesheet" href="styles.css" />
   <!-- Include Blockly's CSS -->
   <link rel="stylesheet" href="https://unpkg.com/blockly/media/blockly.min.css" />
   <!-- Include Blockly's JavaScript -->
   <script src="https://unpkg.com/blockly/blockly.min.js"></script>
   <script src="https://unpkg.com/blockly/lua.min.js"></script>
+  <!-- Include FileSaver.js for downloading code -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body>
-  <h1>Blockly Lua Editor</h1>
+  <h1>Blockly Lua Game Engine Editor</h1>
   <div id="blocklyDiv"></div>
   <h2>Generated Lua Code:</h2>
   <pre id="code"></pre>
+  <button id="downloadBtn">Download Lua Code</button>
   <!-- Define the toolbox -->
   <xml id="toolbox" style="display: none">
+    <category name="Game Engine" colour="120">
+      <block type="game_init"></block>
+      <block type="game_draw"></block>
+      <block type="game_update"></block>
+      <block type="key_pressed"></block>
+      <block type="load_image"></block>
+      <block type="draw_image"></block>
+      <block type="load_sound"></block>
+      <block type="play_sound"></block>
+    </category>
     <category name="Logic" colour="%{BKY_LOGIC_HUE}">
       <block type="controls_if"></block>
       <block type="logic_compare"></block>
@@ -38,7 +51,6 @@
       <block type="math_constant"></block>
       <block type="math_number_property"></block>
       <block type="math_round"></block>
-      <block type="math_on_list"></block>
       <block type="math_modulo"></block>
       <block type="math_constrain"></block>
       <block type="math_random_int"></block>
@@ -58,27 +70,9 @@
       <block type="text_print"></block>
       <block type="text_prompt_ext"></block>
     </category>
-    <category name="Lists" colour="%{BKY_LISTS_HUE}">
-      <block type="lists_create_with"></block>
-      <block type="lists_create_with"></block>
-      <block type="lists_repeat"></block>
-      <block type="lists_length"></block>
-      <block type="lists_isEmpty"></block>
-      <block type="lists_indexOf"></block>
-      <block type="lists_getIndex"></block>
-      <block type="lists_setIndex"></block>
-      <block type="lists_getSublist"></block>
-      <block type="lists_split"></block>
-      <block type="lists_sort"></block>
-    </category>
     <category name="Variables" custom="VARIABLE" colour="%{BKY_VARIABLES_HUE}">
     </category>
     <category name="Functions" custom="PROCEDURE" colour="%{BKY_PROCEDURES_HUE}">
-    </category>
-    <category name="Custom" colour="210">
-      <!-- Custom blocks will be added here -->
-      <block type="lua_input"></block>
-      <block type="lua_function_return"></block>
     </category>
   </xml>
   <!-- Include your main JavaScript file -->
