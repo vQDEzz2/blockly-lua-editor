@@ -14,54 +14,167 @@ workspace.addChangeListener(updateCode);
 
 // Define custom blocks
 Blockly.defineBlocksWithJsonArray([
-  // 1. Create Part Block
+  // 1. Input Block
   {
-    "type": "create_part",
-    "message0": "Create %1 Part named %2",
+    "type": "lua_input",
+    "message0": "Input prompt %1",
     "args0": [
       {
-        "type": "field_dropdown",
-        "name": "PART_TYPE",
-        "options": [
-          ["Block", "Part"],
-          ["Sphere", "Sphere"],
-          ["Wedge", "WedgePart"],
-          ["Cylinder", "Cylinder"],
-          ["Corner Wedge", "CornerWedgePart"]
-        ]
+        "type": "input_value",
+        "name": "PROMPT",
+        "check": "String"
+      }
+    ],
+    "output": "String",
+    "colour": 160,
+    "tooltip": "Prompts the user for input",
+    "helpUrl": ""
+  },
+  // 2. Function with Return Block
+  {
+    "type": "lua_function_return",
+    "message0": "Define function %1 with parameters %2",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "FUNC_NAME",
+        "text": "myFunction"
       },
       {
         "type": "field_input",
-        "name": "PART_NAME",
-        "text": "myPart"
+        "name": "PARAMS",
+        "text": "a, b"
+      }
+    ],
+    "message1": "do %1",
+    "args1": [
+      {
+        "type": "input_statement",
+        "name": "STACK"
+      }
+    ],
+    "message2": "return %1",
+    "args2": [
+      {
+        "type": "input_value",
+        "name": "RETURN"
+      }
+    ],
+    "colour": 290,
+    "tooltip": "Defines a function with a return value",
+    "helpUrl": ""
+  },
+  // 3. Create Table Block
+  {
+    "type": "lua_create_table",
+    "message0": "Create table %1",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "TABLE_NAME",
+        "text": "myTable"
       }
     ],
     "previousStatement": null,
     "nextStatement": null,
     "colour": 230,
-    "tooltip": "Creates a new part",
+    "tooltip": "Creates a new table",
     "helpUrl": ""
   },
-  // 2. Set Property Block
+  // 4. Table Insert Block
   {
-    "type": "set_property",
-    "message0": "Set %1 %2 to %3",
+    "type": "lua_table_insert",
+    "message0": "Insert %1 into %2",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "VALUE"
+      },
+      {
+        "type": "field_input",
+        "name": "TABLE_NAME",
+        "text": "myTable"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "Inserts a value into a table",
+    "helpUrl": ""
+  },
+  // 5. Print Block
+  {
+    "type": "lua_print",
+    "message0": "Print %1",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "TEXT"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Prints text to the console",
+    "helpUrl": ""
+  },
+  // 6. Conditional Block
+  {
+    "type": "lua_if",
+    "message0": "If %1 then",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "CONDITION",
+        "check": "Boolean"
+      }
+    ],
+    "message1": "%1",
+    "args1": [
+      {
+        "type": "input_statement",
+        "name": "DO"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 210,
+    "tooltip": "If condition",
+    "helpUrl": ""
+  },
+  // 7. Loop Block
+  {
+    "type": "lua_while",
+    "message0": "While %1 do",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "CONDITION",
+        "check": "Boolean"
+      }
+    ],
+    "message1": "%1",
+    "args1": [
+      {
+        "type": "input_statement",
+        "name": "DO"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "While loop",
+    "helpUrl": ""
+  },
+  // 8. Assignment Block
+  {
+    "type": "lua_assignment",
+    "message0": "Set %1 to %2",
     "args0": [
       {
         "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
-      },
-      {
-        "type": "field_dropdown",
-        "name": "PROPERTY",
-        "options": [
-          ["Position", "Position"],
-          ["Size", "Size"],
-          ["Color", "Color"],
-          ["Transparency", "Transparency"],
-          ["Anchored", "Anchored"]
-        ]
+        "name": "VAR_NAME",
+        "text": "variable"
       },
       {
         "type": "input_value",
@@ -70,259 +183,158 @@ Blockly.defineBlocksWithJsonArray([
     ],
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 230,
-    "tooltip": "Sets a property of an object",
+    "colour": 330,
+    "tooltip": "Assigns a value to a variable",
     "helpUrl": ""
   },
-  // 3. Set Material Block
+  // 9. Math Operation Block
   {
-    "type": "set_material",
-    "message0": "Set %1 material to %2",
+    "type": "lua_math_operation",
+    "message0": "%1 %2 %3",
     "args0": [
       {
-        "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
+        "type": "input_value",
+        "name": "A",
+        "check": "Number"
       },
       {
         "type": "field_dropdown",
-        "name": "MATERIAL",
+        "name": "OP",
         "options": [
-          ["Plastic", "Enum.Material.Plastic"],
-          ["Wood", "Enum.Material.Wood"],
-          ["Metal", "Enum.Material.Metal"],
-          ["Grass", "Enum.Material.Grass"],
-          ["Brick", "Enum.Material.Brick"]
+          ["+", "+"],
+          ["-", "-"],
+          ["×", "*"],
+          ["÷", "/"],
+          ["^", "^"]
         ]
+      },
+      {
+        "type": "input_value",
+        "name": "B",
+        "check": "Number"
       }
     ],
-    "previousStatement": null,
-    "nextStatement": null,
+    "output": "Number",
     "colour": 230,
-    "tooltip": "Sets the material of a part",
+    "tooltip": "Performs a math operation",
     "helpUrl": ""
   },
-  // 4. Move Part Block
+  // 10. Comparison Block
   {
-    "type": "move_part",
-    "message0": "Move %1 by x: %2 y: %3 z: %4",
-    "args0": [
-      {
-        "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
-      },
-      {
-        "type": "input_value",
-        "name": "X"
-      },
-      {
-        "type": "input_value",
-        "name": "Y"
-      },
-      {
-        "type": "input_value",
-        "name": "Z"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 230,
-    "tooltip": "Moves a part by the specified amounts",
-    "helpUrl": ""
-  },
-  // 5. Play Sound Block
-  {
-    "type": "play_sound",
-    "message0": "Play sound %1 at %2",
-    "args0": [
-      {
-        "type": "field_input",
-        "name": "SOUND_ID",
-        "text": "rbxassetid://123456789"
-      },
-      {
-        "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 20,
-    "tooltip": "Plays a sound at the specified object",
-    "helpUrl": ""
-  },
-  // 6. Set Parent Block
-  {
-    "type": "set_parent",
-    "message0": "Set %1 parent to %2",
-    "args0": [
-      {
-        "type": "field_input",
-        "name": "CHILD",
-        "text": "myPart"
-      },
-      {
-        "type": "field_input",
-        "name": "PARENT",
-        "text": "workspace"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 290,
-    "tooltip": "Changes the parent of an object",
-    "helpUrl": ""
-  },
-  // 7. Destroy Object Block
-  {
-    "type": "destroy_object",
-    "message0": "Destroy %1",
-    "args0": [
-      {
-        "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 0,
-    "tooltip": "Destroys the specified object",
-    "helpUrl": ""
-  },
-  // 8. On Touch Event Block
-  {
-    "type": "on_touch",
-    "message0": "When %1 is touched do %2",
-    "args0": [
-      {
-        "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
-      },
-      {
-        "type": "input_statement",
-        "name": "DO"
-      }
-    ],
-    "colour": 160,
-    "tooltip": "Runs code when the object is touched",
-    "helpUrl": ""
-  },
-  // 9. Wait Block
-  {
-    "type": "wait",
-    "message0": "Wait %1 seconds",
+    "type": "lua_comparison",
+    "message0": "%1 %2 %3",
     "args0": [
       {
         "type": "input_value",
-        "name": "SECONDS"
+        "name": "A"
+      },
+      {
+        "type": "field_dropdown",
+        "name": "OP",
+        "options": [
+          ["=", "=="],
+          ["≠", "~="],
+          ["<", "<"],
+          ["≤", "<="],
+          [">", ">"],
+          ["≥", ">="]
+        ]
+      },
+      {
+        "type": "input_value",
+        "name": "B"
       }
     ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 120,
-    "tooltip": "Pauses the script for a specified duration",
+    "output": "Boolean",
+    "colour": 210,
+    "tooltip": "Performs a comparison",
     "helpUrl": ""
   }
 ]);
 
 // Define Lua code generators
 
-// 1. Create Part Generator
-Blockly.Lua['create_part'] = function(block) {
-  var dropdown_part_type = block.getFieldValue('PART_TYPE');
-  var text_part_name = block.getFieldValue('PART_NAME');
-  var code = text_part_name + ' = Instance.new("' + dropdown_part_type + '")\n';
-  code += text_part_name + '.Parent = workspace\n';
-  return code;
+// 1. Input Generator
+Blockly.Lua['lua_input'] = function(block) {
+  var value_prompt = Blockly.Lua.valueToCode(block, 'PROMPT', Blockly.Lua.ORDER_ATOMIC) || '""';
+  var code = 'io.write(' + value_prompt + ')\nlocal input = io.read()';
+  return ['input', Blockly.Lua.ORDER_NONE];
 };
 
-// 2. Set Property Generator
-Blockly.Lua['set_property'] = function(block) {
-  var text_object_name = block.getFieldValue('OBJECT_NAME');
-  var dropdown_property = block.getFieldValue('PROPERTY');
-  var value = Blockly.Lua.valueToCode(block, 'VALUE', Blockly.Lua.ORDER_ATOMIC);
-
-  if (dropdown_property === 'Color') {
-    // Ensure color value is in Color3.new format
-    if (!value.startsWith('Color3.new')) {
-      value = 'Color3.new(' + value + ')';
-    }
-  } else if (dropdown_property === 'Position' || dropdown_property === 'Size') {
-    // Ensure vector value is in Vector3.new format
-    if (!value.startsWith('Vector3.new')) {
-      value = 'Vector3.new(' + value + ')';
-    }
+// 2. Function with Return Generator
+Blockly.Lua['lua_function_return'] = function(block) {
+  var text_func_name = block.getFieldValue('FUNC_NAME');
+  var text_params = block.getFieldValue('PARAMS');
+  var statements_stack = Blockly.Lua.statementToCode(block, 'STACK');
+  var value_return = Blockly.Lua.valueToCode(block, 'RETURN', Blockly.Lua.ORDER_NONE);
+  var code = 'function ' + text_func_name + '(' + text_params + ')\n' + statements_stack;
+  if (value_return) {
+    code += '  return ' + value_return + '\n';
   }
-
-  var code = text_object_name + '.' + dropdown_property + ' = ' + value + '\n';
+  code += 'end\n';
   return code;
 };
 
-// 3. Set Material Generator
-Blockly.Lua['set_material'] = function(block) {
-  var text_object_name = block.getFieldValue('OBJECT_NAME');
-  var dropdown_material = block.getFieldValue('MATERIAL');
-  var code = text_object_name + '.Material = ' + dropdown_material + '\n';
+// 3. Create Table Generator
+Blockly.Lua['lua_create_table'] = function(block) {
+  var text_table_name = block.getFieldValue('TABLE_NAME');
+  var code = text_table_name + ' = {}\n';
   return code;
 };
 
-// 4. Move Part Generator
-Blockly.Lua['move_part'] = function(block) {
-  var text_object_name = block.getFieldValue('OBJECT_NAME');
-  var value_x = Blockly.Lua.valueToCode(block, 'X', Blockly.Lua.ORDER_ATOMIC) || '0';
-  var value_y = Blockly.Lua.valueToCode(block, 'Y', Blockly.Lua.ORDER_ATOMIC) || '0';
-  var value_z = Blockly.Lua.valueToCode(block, 'Z', Blockly.Lua.ORDER_ATOMIC) || '0';
-  var code = text_object_name + '.Position = ' + text_object_name + '.Position + Vector3.new(' + value_x + ', ' + value_y + ', ' + value_z + ')\n';
+// 4. Table Insert Generator
+Blockly.Lua['lua_table_insert'] = function(block) {
+  var value_value = Blockly.Lua.valueToCode(block, 'VALUE', Blockly.Lua.ORDER_ATOMIC);
+  var text_table_name = block.getFieldValue('TABLE_NAME');
+  var code = 'table.insert(' + text_table_name + ', ' + value_value + ')\n';
   return code;
 };
 
-// 5. Play Sound Generator
-Blockly.Lua['play_sound'] = function(block) {
-  var text_sound_id = block.getFieldValue('SOUND_ID');
-  var text_object_name = block.getFieldValue('OBJECT_NAME');
-  var soundVar = 'sound_' + Math.floor(Math.random() * 1000);
-  var code = soundVar + ' = Instance.new("Sound")\n';
-  code += soundVar + '.SoundId = "' + text_sound_id + '"\n';
-  code += soundVar + '.Parent = ' + text_object_name + '\n';
-  code += soundVar + ':Play()\n';
+// 5. Print Generator
+Blockly.Lua['lua_print'] = function(block) {
+  var value_text = Blockly.Lua.valueToCode(block, 'TEXT', Blockly.Lua.ORDER_NONE) || '""';
+  var code = 'print(' + value_text + ')\n';
   return code;
 };
 
-// 6. Set Parent Generator
-Blockly.Lua['set_parent'] = function(block) {
-  var text_child = block.getFieldValue('CHILD');
-  var text_parent = block.getFieldValue('PARENT');
-  var code = text_child + '.Parent = ' + text_parent + '\n';
-  return code;
-};
-
-// 7. Destroy Object Generator
-Blockly.Lua['destroy_object'] = function(block) {
-  var text_object_name = block.getFieldValue('OBJECT_NAME');
-  var code = text_object_name + ':Destroy()\n';
-  return code;
-};
-
-// 8. On Touch Event Generator
-Blockly.Lua['on_touch'] = function(block) {
-  var text_object_name = block.getFieldValue('OBJECT_NAME');
+// 6. Conditional Generator
+Blockly.Lua['lua_if'] = function(block) {
+  var value_condition = Blockly.Lua.valueToCode(block, 'CONDITION', Blockly.Lua.ORDER_NONE) || 'false';
   var statements_do = Blockly.Lua.statementToCode(block, 'DO');
-  var functionName = Blockly.Lua.provideFunction_(
-    'onTouchEvent',
-    ['function ' + Blockly.Lua.FUNCTION_NAME_PLACEHOLDER_ + '(hit)',
-     statements_do + 'end']
-  );
-  var code = text_object_name + '.Touched:Connect(' + functionName + ')\n';
+  var code = 'if ' + value_condition + ' then\n' + statements_do + 'end\n';
   return code;
 };
 
-// 9. Wait Generator
-Blockly.Lua['wait'] = function(block) {
-  var value_seconds = Blockly.Lua.valueToCode(block, 'SECONDS', Blockly.Lua.ORDER_ATOMIC) || '0';
-  var code = 'wait(' + value_seconds + ')\n';
+// 7. Loop Generator
+Blockly.Lua['lua_while'] = function(block) {
+  var value_condition = Blockly.Lua.valueToCode(block, 'CONDITION', Blockly.Lua.ORDER_NONE) || 'false';
+  var statements_do = Blockly.Lua.statementToCode(block, 'DO');
+  var code = 'while ' + value_condition + ' do\n' + statements_do + 'end\n';
   return code;
+};
+
+// 8. Assignment Generator
+Blockly.Lua['lua_assignment'] = function(block) {
+  var text_var_name = block.getFieldValue('VAR_NAME');
+  var value_value = Blockly.Lua.valueToCode(block, 'VALUE', Blockly.Lua.ORDER_NONE) || '0';
+  var code = text_var_name + ' = ' + value_value + '\n';
+  return code;
+};
+
+// 9. Math Operation Generator
+Blockly.Lua['lua_math_operation'] = function(block) {
+  var value_a = Blockly.Lua.valueToCode(block, 'A', Blockly.Lua.ORDER_NONE) || '0';
+  var dropdown_op = block.getFieldValue('OP');
+  var value_b = Blockly.Lua.valueToCode(block, 'B', Blockly.Lua.ORDER_NONE) || '0';
+  var code = '(' + value_a + ' ' + dropdown_op + ' ' + value_b + ')';
+  return [code, Blockly.Lua.ORDER_NONE];
+};
+
+// 10. Comparison Generator
+Blockly.Lua['lua_comparison'] = function(block) {
+  var value_a = Blockly.Lua.valueToCode(block, 'A', Blockly.Lua.ORDER_RELATIONAL) || '0';
+  var dropdown_op = block.getFieldValue('OP');
+  var value_b = Blockly.Lua.valueToCode(block, 'B', Blockly.Lua.ORDER_RELATIONAL) || '0';
+  var code = value_a + ' ' + dropdown_op + ' ' + value_b;
+  return [code, Blockly.Lua.ORDER_RELATIONAL];
 };
