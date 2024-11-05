@@ -12,6 +12,13 @@ function updateCode(event) {
 // Add change listener
 workspace.addChangeListener(updateCode);
 
+// Handle code download
+document.getElementById('downloadBtn').addEventListener('click', function() {
+  var code = Blockly.Lua.workspaceToCode(workspace);
+  var blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+  saveAs(blob, 'main.lua');
+});
+
 // Define custom blocks
 Blockly.defineBlocksWithJsonArray([
   // Game Init Block
@@ -170,21 +177,21 @@ Blockly.defineBlocksWithJsonArray([
 // Game Init Generator
 Blockly.Lua['game_init'] = function(block) {
   var statements_init_code = Blockly.Lua.statementToCode(block, 'INIT_CODE');
-  var code = '-- Initialization\nfunction love.load()\n' + statements_init_code + 'end\n';
+  var code = 'function love.load()\n' + statements_init_code + 'end\n';
   return code;
 };
 
 // Game Draw Generator
 Blockly.Lua['game_draw'] = function(block) {
   var statements_draw_code = Blockly.Lua.statementToCode(block, 'DRAW_CODE');
-  var code = '-- Drawing\nfunction love.draw()\n' + statements_draw_code + 'end\n';
+  var code = 'function love.draw()\n' + statements_draw_code + 'end\n';
   return code;
 };
 
 // Game Update Generator
 Blockly.Lua['game_update'] = function(block) {
   var statements_update_code = Blockly.Lua.statementToCode(block, 'UPDATE_CODE');
-  var code = '-- Updating\nfunction love.update(dt)\n' + statements_update_code + 'end\n';
+  var code = 'function love.update(dt)\n' + statements_update_code + 'end\n';
   return code;
 };
 
@@ -192,13 +199,15 @@ Blockly.Lua['game_update'] = function(block) {
 Blockly.Lua['key_pressed'] = function(block) {
   var key = block.getFieldValue('KEY');
   var statements_key_code = Blockly.Lua.statementToCode(block, 'KEY_CODE');
+  var functionName = 'love_keypressed';
   var code = 'if key == "' + key + '" then\n' + statements_key_code + 'end\n';
-  Blockly.Lua.definitions_['love_keypressed'] = `
--- Keyboard Input
-function love.keypressed(key)
-` + (Blockly.Lua.definitions_['love_keypressed_body'] || '') + `
-end
-`;
+  
+  // Ensure the function is only defined once
+  if (!Blockly.Lua.definitions_[functionName]) {
+    Blockly.Lua.definitions_[functionName] = 'function love.keypressed(key)\n' +
+      Blockly.Lua.definitions_['love_keypressed_body'] + 'end\n';
+  }
+  
   Blockly.Lua.definitions_['love_keypressed_body'] = (Blockly.Lua.definitions_['love_keypressed_body'] || '') + code;
   return '';
 };
