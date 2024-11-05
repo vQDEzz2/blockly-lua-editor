@@ -14,498 +14,223 @@ workspace.addChangeListener(updateCode);
 
 // Define custom blocks
 Blockly.defineBlocksWithJsonArray([
-  // 1. Variable Declaration Block
+  // Game Init Block
   {
-    "type": "variable_declare",
-    "message0": "Declare %1 %2",
+    "type": "game_init",
+    "message0": "When game starts %1",
     "args0": [
-      {
-        "type": "field_dropdown",
-        "name": "VAR_TYPE",
-        "options": [
-          ["local", "local"],
-          ["global", ""]
-        ]
-      },
-      {
-        "type": "field_input",
-        "name": "VAR_NAME",
-        "text": "variable"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 330,
-    "tooltip": "Declares a variable",
-    "helpUrl": ""
-  },
-  // 2. Variable Assignment Block
-  {
-    "type": "variable_set",
-    "message0": "Set %1 to %2",
-    "args0": [
-      {
-        "type": "field_input",
-        "name": "VAR_NAME",
-        "text": "variable"
-      },
-      {
-        "type": "input_value",
-        "name": "VALUE"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 330,
-    "tooltip": "Assigns a value to a variable",
-    "helpUrl": ""
-  },
-  // 3. Function Definition Block
-  {
-    "type": "function_definition",
-    "message0": "Define function %1 with parameters %2",
-    "args0": [
-      {
-        "type": "field_input",
-        "name": "FUNC_NAME",
-        "text": "myFunction"
-      },
-      {
-        "type": "field_input",
-        "name": "PARAMS",
-        "text": ""
-      }
-    ],
-    "message1": "do %1",
-    "args1": [
       {
         "type": "input_statement",
-        "name": "BODY"
+        "name": "INIT_CODE"
       }
     ],
-    "colour": 290,
-    "tooltip": "Defines a function",
+    "colour": 120,
+    "tooltip": "Code to run when the game starts",
     "helpUrl": ""
   },
-  // 4. Function Call Block
+  // Game Draw Block
   {
-    "type": "function_call",
-    "message0": "Call function %1 with arguments %2",
+    "type": "game_draw",
+    "message0": "Every frame draw %1",
     "args0": [
       {
-        "type": "field_input",
-        "name": "FUNC_NAME",
-        "text": "myFunction"
-      },
-      {
-        "type": "field_input",
-        "name": "ARGS",
-        "text": ""
+        "type": "input_statement",
+        "name": "DRAW_CODE"
       }
     ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 290,
-    "tooltip": "Calls a function",
-    "helpUrl": ""
-  },
-  // 5. Print Block
-  {
-    "type": "print",
-    "message0": "Print %1",
-    "args0": [
-      {
-        "type": "input_value",
-        "name": "TEXT"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
     "colour": 160,
-    "tooltip": "Prints text to the console",
+    "tooltip": "Code to run every frame to draw on the screen",
     "helpUrl": ""
   },
-  // 6. If Statement Block
+  // Game Update Block
   {
-    "type": "if_statement",
-    "message0": "If %1 then",
-    "args0": [
-      {
-        "type": "input_value",
-        "name": "CONDITION",
-        "check": "Boolean"
-      }
-    ],
-    "message1": "%1",
-    "args1": [
-      {
-        "type": "input_statement",
-        "name": "THEN"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 210,
-    "tooltip": "If statement",
-    "helpUrl": ""
-  },
-  // 7. If-Else Statement Block
-  {
-    "type": "if_else_statement",
-    "message0": "If %1 then",
-    "args0": [
-      {
-        "type": "input_value",
-        "name": "CONDITION",
-        "check": "Boolean"
-      }
-    ],
-    "message1": "%1",
-    "args1": [
-      {
-        "type": "input_statement",
-        "name": "THEN"
-      }
-    ],
-    "message2": "Else %1",
-    "args2": [
-      {
-        "type": "input_statement",
-        "name": "ELSE"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 210,
-    "tooltip": "If-Else statement",
-    "helpUrl": ""
-  },
-  // 8. While Loop Block
-  {
-    "type": "while_loop",
-    "message0": "While %1 do",
-    "args0": [
-      {
-        "type": "input_value",
-        "name": "CONDITION",
-        "check": "Boolean"
-      }
-    ],
-    "message1": "%1",
-    "args1": [
-      {
-        "type": "input_statement",
-        "name": "DO"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 120,
-    "tooltip": "While loop",
-    "helpUrl": ""
-  },
-  // 9. Repeat Until Loop Block
-  {
-    "type": "repeat_until_loop",
-    "message0": "Repeat %1 until %2",
+    "type": "game_update",
+    "message0": "Every frame update %1",
     "args0": [
       {
         "type": "input_statement",
-        "name": "DO"
-      },
-      {
-        "type": "input_value",
-        "name": "CONDITION",
-        "check": "Boolean"
+        "name": "UPDATE_CODE"
       }
     ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 120,
-    "tooltip": "Repeat until loop",
+    "colour": 200,
+    "tooltip": "Code to run every frame to update game state",
     "helpUrl": ""
   },
-  // 10. For Loop Block
+  // Key Pressed Block
   {
-    "type": "for_loop",
-    "message0": "For %1 = %2 to %3 do",
+    "type": "key_pressed",
+    "message0": "When key %1 is pressed %2",
     "args0": [
       {
         "type": "field_input",
-        "name": "VAR_NAME",
-        "text": "i"
+        "name": "KEY",
+        "text": "space"
       },
-      {
-        "type": "input_value",
-        "name": "START",
-        "check": "Number"
-      },
-      {
-        "type": "input_value",
-        "name": "END",
-        "check": "Number"
-      }
-    ],
-    "message1": "%1",
-    "args1": [
       {
         "type": "input_statement",
-        "name": "DO"
+        "name": "KEY_CODE"
+      }
+    ],
+    "colour": 260,
+    "tooltip": "Code to run when a specific key is pressed",
+    "helpUrl": ""
+  },
+  // Load Image Block
+  {
+    "type": "load_image",
+    "message0": "Load image %1 from file %2",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "IMAGE_VAR",
+        "text": "myImage"
+      },
+      {
+        "type": "field_input",
+        "name": "FILE_PATH",
+        "text": "image.png"
       }
     ],
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 120,
-    "tooltip": "For loop",
+    "colour": 65,
+    "tooltip": "Loads an image from a file",
     "helpUrl": ""
   },
-  // 11. Math Operation Block
+  // Draw Image Block
   {
-    "type": "math_operation",
-    "message0": "%1 %2 %3",
+    "type": "draw_image",
+    "message0": "Draw image %1 at x: %2 y: %3",
     "args0": [
       {
+        "type": "field_input",
+        "name": "IMAGE_VAR",
+        "text": "myImage"
+      },
+      {
         "type": "input_value",
-        "name": "A",
+        "name": "X",
         "check": "Number"
       },
       {
-        "type": "field_dropdown",
-        "name": "OP",
-        "options": [
-          ["+", "+"],
-          ["-", "-"],
-          ["*", "*"],
-          ["/", "/"],
-          ["^", "^"]
-        ]
-      },
-      {
         "type": "input_value",
-        "name": "B",
+        "name": "Y",
         "check": "Number"
-      }
-    ],
-    "output": "Number",
-    "colour": 230,
-    "tooltip": "Performs a math operation",
-    "helpUrl": ""
-  },
-  // 12. Comparison Block
-  {
-    "type": "comparison",
-    "message0": "%1 %2 %3",
-    "args0": [
-      {
-        "type": "input_value",
-        "name": "A"
-      },
-      {
-        "type": "field_dropdown",
-        "name": "OP",
-        "options": [
-          ["==", "=="],
-          ["~=", "~="],
-          ["<", "<"],
-          ["<=", "<="],
-          [">", ">"],
-          [">=", ">="]
-        ]
-      },
-      {
-        "type": "input_value",
-        "name": "B"
-      }
-    ],
-    "output": "Boolean",
-    "colour": 210,
-    "tooltip": "Performs a comparison",
-    "helpUrl": ""
-  },
-  // 13. Logical Operation Block
-  {
-    "type": "logical_operation",
-    "message0": "%1 %2 %3",
-    "args0": [
-      {
-        "type": "input_value",
-        "name": "A",
-        "check": "Boolean"
-      },
-      {
-        "type": "field_dropdown",
-        "name": "OP",
-        "options": [
-          ["and", "and"],
-          ["or", "or"]
-        ]
-      },
-      {
-        "type": "input_value",
-        "name": "B",
-        "check": "Boolean"
-      }
-    ],
-    "output": "Boolean",
-    "colour": 210,
-    "tooltip": "Performs a logical operation",
-    "helpUrl": ""
-  },
-  // 14. Not Operation Block
-  {
-    "type": "not_operation",
-    "message0": "not %1",
-    "args0": [
-      {
-        "type": "input_value",
-        "name": "A",
-        "check": "Boolean"
-      }
-    ],
-    "output": "Boolean",
-    "colour": 210,
-    "tooltip": "Logical NOT operation",
-    "helpUrl": ""
-  },
-  // 15. Return Statement Block
-  {
-    "type": "return_statement",
-    "message0": "Return %1",
-    "args0": [
-      {
-        "type": "input_value",
-        "name": "VALUE"
       }
     ],
     "previousStatement": null,
-    "colour": 290,
-    "tooltip": "Returns a value from a function",
+    "nextStatement": null,
+    "colour": 65,
+    "tooltip": "Draws an image at the specified coordinates",
     "helpUrl": ""
-  }
+  },
+  // Load Sound Block
+  {
+    "type": "load_sound",
+    "message0": "Load sound %1 from file %2",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "SOUND_VAR",
+        "text": "mySound"
+      },
+      {
+        "type": "field_input",
+        "name": "FILE_PATH",
+        "text": "sound.wav"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 20,
+    "tooltip": "Loads a sound from a file",
+    "helpUrl": ""
+  },
+  // Play Sound Block
+  {
+    "type": "play_sound",
+    "message0": "Play sound %1",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "SOUND_VAR",
+        "text": "mySound"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 20,
+    "tooltip": "Plays a sound",
+    "helpUrl": ""
+  },
 ]);
 
 // Define Lua code generators
 
-// 1. Variable Declaration Generator
-Blockly.Lua['variable_declare'] = function(block) {
-  var varType = block.getFieldValue('VAR_TYPE');
-  var varName = block.getFieldValue('VAR_NAME');
-  var code = varType + ' ' + varName + '\n';
+// Game Init Generator
+Blockly.Lua['game_init'] = function(block) {
+  var statements_init_code = Blockly.Lua.statementToCode(block, 'INIT_CODE');
+  var code = '-- Initialization\nfunction love.load()\n' + statements_init_code + 'end\n';
   return code;
 };
 
-// 2. Variable Assignment Generator
-Blockly.Lua['variable_set'] = function(block) {
-  var varName = block.getFieldValue('VAR_NAME');
-  var value = Blockly.Lua.valueToCode(block, 'VALUE', Blockly.Lua.ORDER_NONE) || 'nil';
-  var code = varName + ' = ' + value + '\n';
+// Game Draw Generator
+Blockly.Lua['game_draw'] = function(block) {
+  var statements_draw_code = Blockly.Lua.statementToCode(block, 'DRAW_CODE');
+  var code = '-- Drawing\nfunction love.draw()\n' + statements_draw_code + 'end\n';
   return code;
 };
 
-// 3. Function Definition Generator
-Blockly.Lua['function_definition'] = function(block) {
-  var funcName = block.getFieldValue('FUNC_NAME');
-  var params = block.getFieldValue('PARAMS');
-  var body = Blockly.Lua.statementToCode(block, 'BODY');
-  var code = 'function ' + funcName + '(' + params + ')\n' + body + 'end\n';
+// Game Update Generator
+Blockly.Lua['game_update'] = function(block) {
+  var statements_update_code = Blockly.Lua.statementToCode(block, 'UPDATE_CODE');
+  var code = '-- Updating\nfunction love.update(dt)\n' + statements_update_code + 'end\n';
   return code;
 };
 
-// 4. Function Call Generator
-Blockly.Lua['function_call'] = function(block) {
-  var funcName = block.getFieldValue('FUNC_NAME');
-  var args = block.getFieldValue('ARGS');
-  var code = funcName + '(' + args + ')\n';
+// Key Pressed Generator
+Blockly.Lua['key_pressed'] = function(block) {
+  var key = block.getFieldValue('KEY');
+  var statements_key_code = Blockly.Lua.statementToCode(block, 'KEY_CODE');
+  var code = 'if key == "' + key + '" then\n' + statements_key_code + 'end\n';
+  Blockly.Lua.definitions_['love_keypressed'] = `
+-- Keyboard Input
+function love.keypressed(key)
+` + (Blockly.Lua.definitions_['love_keypressed_body'] || '') + `
+end
+`;
+  Blockly.Lua.definitions_['love_keypressed_body'] = (Blockly.Lua.definitions_['love_keypressed_body'] || '') + code;
+  return '';
+};
+
+// Load Image Generator
+Blockly.Lua['load_image'] = function(block) {
+  var imageVar = block.getFieldValue('IMAGE_VAR');
+  var filePath = block.getFieldValue('FILE_PATH');
+  var code = imageVar + ' = love.graphics.newImage("' + filePath + '")\n';
   return code;
 };
 
-// 5. Print Generator
-Blockly.Lua['print'] = function(block) {
-  var text = Blockly.Lua.valueToCode(block, 'TEXT', Blockly.Lua.ORDER_NONE) || '""';
-  var code = 'print(' + text + ')\n';
+// Draw Image Generator
+Blockly.Lua['draw_image'] = function(block) {
+  var imageVar = block.getFieldValue('IMAGE_VAR');
+  var x = Blockly.Lua.valueToCode(block, 'X', Blockly.Lua.ORDER_NONE) || '0';
+  var y = Blockly.Lua.valueToCode(block, 'Y', Blockly.Lua.ORDER_NONE) || '0';
+  var code = 'love.graphics.draw(' + imageVar + ', ' + x + ', ' + y + ')\n';
   return code;
 };
 
-// 6. If Statement Generator
-Blockly.Lua['if_statement'] = function(block) {
-  var condition = Blockly.Lua.valueToCode(block, 'CONDITION', Blockly.Lua.ORDER_NONE) || 'false';
-  var statements = Blockly.Lua.statementToCode(block, 'THEN');
-  var code = 'if ' + condition + ' then\n' + statements + 'end\n';
+// Load Sound Generator
+Blockly.Lua['load_sound'] = function(block) {
+  var soundVar = block.getFieldValue('SOUND_VAR');
+  var filePath = block.getFieldValue('FILE_PATH');
+  var code = soundVar + ' = love.audio.newSource("' + filePath + '", "static")\n';
   return code;
 };
 
-// 7. If-Else Statement Generator
-Blockly.Lua['if_else_statement'] = function(block) {
-  var condition = Blockly.Lua.valueToCode(block, 'CONDITION', Blockly.Lua.ORDER_NONE) || 'false';
-  var thenStatements = Blockly.Lua.statementToCode(block, 'THEN');
-  var elseStatements = Blockly.Lua.statementToCode(block, 'ELSE');
-  var code = 'if ' + condition + ' then\n' + thenStatements + 'else\n' + elseStatements + 'end\n';
-  return code;
-};
-
-// 8. While Loop Generator
-Blockly.Lua['while_loop'] = function(block) {
-  var condition = Blockly.Lua.valueToCode(block, 'CONDITION', Blockly.Lua.ORDER_NONE) || 'false';
-  var statements = Blockly.Lua.statementToCode(block, 'DO');
-  var code = 'while ' + condition + ' do\n' + statements + 'end\n';
-  return code;
-};
-
-// 9. Repeat Until Loop Generator
-Blockly.Lua['repeat_until_loop'] = function(block) {
-  var statements = Blockly.Lua.statementToCode(block, 'DO');
-  var condition = Blockly.Lua.valueToCode(block, 'CONDITION', Blockly.Lua.ORDER_NONE) || 'false';
-  var code = 'repeat\n' + statements + 'until ' + condition + '\n';
-  return code;
-};
-
-// 10. For Loop Generator
-Blockly.Lua['for_loop'] = function(block) {
-  var varName = block.getFieldValue('VAR_NAME');
-  var start = Blockly.Lua.valueToCode(block, 'START', Blockly.Lua.ORDER_NONE) || '0';
-  var end = Blockly.Lua.valueToCode(block, 'END', Blockly.Lua.ORDER_NONE) || '0';
-  var statements = Blockly.Lua.statementToCode(block, 'DO');
-  var code = 'for ' + varName + ' = ' + start + ', ' + end + ' do\n' + statements + 'end\n';
-  return code;
-};
-
-// 11. Math Operation Generator
-Blockly.Lua['math_operation'] = function(block) {
-  var a = Blockly.Lua.valueToCode(block, 'A', Blockly.Lua.ORDER_NONE) || '0';
-  var op = block.getFieldValue('OP');
-  var b = Blockly.Lua.valueToCode(block, 'B', Blockly.Lua.ORDER_NONE) || '0';
-  var code = '(' + a + ' ' + op + ' ' + b + ')';
-  return [code, Blockly.Lua.ORDER_NONE];
-};
-
-// 12. Comparison Generator
-Blockly.Lua['comparison'] = function(block) {
-  var a = Blockly.Lua.valueToCode(block, 'A', Blockly.Lua.ORDER_RELATIONAL) || '0';
-  var op = block.getFieldValue('OP');
-  var b = Blockly.Lua.valueToCode(block, 'B', Blockly.Lua.ORDER_RELATIONAL) || '0';
-  var code = a + ' ' + op + ' ' + b;
-  return [code, Blockly.Lua.ORDER_RELATIONAL];
-};
-
-// 13. Logical Operation Generator
-Blockly.Lua['logical_operation'] = function(block) {
-  var a = Blockly.Lua.valueToCode(block, 'A', Blockly.Lua.ORDER_LOGICAL) || 'false';
-  var op = block.getFieldValue('OP');
-  var b = Blockly.Lua.valueToCode(block, 'B', Blockly.Lua.ORDER_LOGICAL) || 'false';
-  var code = a + ' ' + op + ' ' + b;
-  return [code, Blockly.Lua.ORDER_LOGICAL];
-};
-
-// 14. Not Operation Generator
-Blockly.Lua['not_operation'] = function(block) {
-  var a = Blockly.Lua.valueToCode(block, 'A', Blockly.Lua.ORDER_LOGICAL_NOT) || 'false';
-  var code = 'not ' + a;
-  return [code, Blockly.Lua.ORDER_LOGICAL_NOT];
-};
-
-// 15. Return Statement Generator
-Blockly.Lua['return_statement'] = function(block) {
-  var value = Blockly.Lua.valueToCode(block, 'VALUE', Blockly.Lua.ORDER_NONE) || '';
-  var code = 'return ' + value + '\n';
+// Play Sound Generator
+Blockly.Lua['play_sound'] = function(block) {
+  var soundVar = block.getFieldValue('SOUND_VAR');
+  var code = soundVar + ':play()\n';
   return code;
 };
