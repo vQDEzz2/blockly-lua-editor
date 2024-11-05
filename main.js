@@ -14,55 +14,40 @@ workspace.addChangeListener(updateCode);
 
 // Define custom blocks
 Blockly.defineBlocksWithJsonArray([
-  // 1. Create Part Block
+  // 1. Variable Declaration Block
   {
-    "type": "create_part",
-    "message0": "Create %1 Part named %2",
+    "type": "variable_declare",
+    "message0": "Declare %1 %2",
     "args0": [
       {
         "type": "field_dropdown",
-        "name": "PART_TYPE",
+        "name": "VAR_TYPE",
         "options": [
-          ["Part", "Part"],
-          ["Sphere", "Sphere"],
-          ["Wedge", "WedgePart"],
-          ["Cylinder", "CylinderMesh"],
-          ["Corner Wedge", "CornerWedgePart"]
+          ["local", "local"],
+          ["global", ""]
         ]
       },
       {
         "type": "field_input",
-        "name": "PART_NAME",
-        "text": "myPart"
+        "name": "VAR_NAME",
+        "text": "variable"
       }
     ],
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 230,
-    "tooltip": "Creates a new part and adds it to the workspace",
+    "colour": 330,
+    "tooltip": "Declares a variable",
     "helpUrl": ""
   },
-  // 2. Set Property Block
+  // 2. Variable Assignment Block
   {
-    "type": "set_property",
-    "message0": "Set %1's %2 to %3",
+    "type": "variable_set",
+    "message0": "Set %1 to %2",
     "args0": [
       {
         "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
-      },
-      {
-        "type": "field_dropdown",
-        "name": "PROPERTY",
-        "options": [
-          ["Position", "Position"],
-          ["Size", "Size"],
-          ["Color", "Color"],
-          ["Transparency", "Transparency"],
-          ["Anchored", "Anchored"],
-          ["CanCollide", "CanCollide"]
-        ]
+        "name": "VAR_NAME",
+        "text": "variable"
       },
       {
         "type": "input_value",
@@ -71,79 +56,60 @@ Blockly.defineBlocksWithJsonArray([
     ],
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 230,
-    "tooltip": "Sets a property of an object",
+    "colour": 330,
+    "tooltip": "Assigns a value to a variable",
     "helpUrl": ""
   },
-  // 3. Move Part Block
+  // 3. Function Definition Block
   {
-    "type": "move_part",
-    "message0": "Move %1 by x: %2 y: %3 z: %4",
+    "type": "function_definition",
+    "message0": "Define function %1 with parameters %2",
     "args0": [
       {
         "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
+        "name": "FUNC_NAME",
+        "text": "myFunction"
       },
       {
-        "type": "input_value",
-        "name": "X",
-        "check": "Number"
-      },
-      {
-        "type": "input_value",
-        "name": "Y",
-        "check": "Number"
-      },
-      {
-        "type": "input_value",
-        "name": "Z",
-        "check": "Number"
+        "type": "field_input",
+        "name": "PARAMS",
+        "text": ""
       }
     ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 230,
-    "tooltip": "Moves a part by the specified amounts",
-    "helpUrl": ""
-  },
-  // 4. On Touch Event Block
-  {
-    "type": "on_touch",
-    "message0": "When %1 is touched do %2",
-    "args0": [
-      {
-        "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
-      },
+    "message1": "do %1",
+    "args1": [
       {
         "type": "input_statement",
-        "name": "DO"
+        "name": "BODY"
       }
     ],
-    "colour": 160,
-    "tooltip": "Runs code when the object is touched",
+    "colour": 290,
+    "tooltip": "Defines a function",
     "helpUrl": ""
   },
-  // 5. Wait Block
+  // 4. Function Call Block
   {
-    "type": "wait",
-    "message0": "Wait %1 seconds",
+    "type": "function_call",
+    "message0": "Call function %1 with arguments %2",
     "args0": [
       {
-        "type": "input_value",
-        "name": "SECONDS",
-        "check": "Number"
+        "type": "field_input",
+        "name": "FUNC_NAME",
+        "text": "myFunction"
+      },
+      {
+        "type": "field_input",
+        "name": "ARGS",
+        "text": ""
       }
     ],
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 120,
-    "tooltip": "Pauses the script for a specified duration",
+    "colour": 290,
+    "tooltip": "Calls a function",
     "helpUrl": ""
   },
-  // 6. Print Block
+  // 5. Print Block
   {
     "type": "print",
     "message0": "Print %1",
@@ -156,244 +122,390 @@ Blockly.defineBlocksWithJsonArray([
     "previousStatement": null,
     "nextStatement": null,
     "colour": 160,
-    "tooltip": "Prints text to the output",
+    "tooltip": "Prints text to the console",
     "helpUrl": ""
   },
-  // 7. Destroy Object Block
+  // 6. If Statement Block
   {
-    "type": "destroy_object",
-    "message0": "Destroy %1",
+    "type": "if_statement",
+    "message0": "If %1 then",
     "args0": [
       {
-        "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
+        "type": "input_value",
+        "name": "CONDITION",
+        "check": "Boolean"
+      }
+    ],
+    "message1": "%1",
+    "args1": [
+      {
+        "type": "input_statement",
+        "name": "THEN"
       }
     ],
     "previousStatement": null,
     "nextStatement": null,
-    "colour": 0,
-    "tooltip": "Destroys the specified object",
+    "colour": 210,
+    "tooltip": "If statement",
     "helpUrl": ""
   },
-  // 8. Spawn Part Block
+  // 7. If-Else Statement Block
   {
-    "type": "spawn_part",
-    "message0": "Spawn %1 at position x: %2 y: %3 z: %4",
+    "type": "if_else_statement",
+    "message0": "If %1 then",
     "args0": [
       {
-        "type": "field_input",
-        "name": "PART_NAME",
-        "text": "myPart"
+        "type": "input_value",
+        "name": "CONDITION",
+        "check": "Boolean"
+      }
+    ],
+    "message1": "%1",
+    "args1": [
+      {
+        "type": "input_statement",
+        "name": "THEN"
+      }
+    ],
+    "message2": "Else %1",
+    "args2": [
+      {
+        "type": "input_statement",
+        "name": "ELSE"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 210,
+    "tooltip": "If-Else statement",
+    "helpUrl": ""
+  },
+  // 8. While Loop Block
+  {
+    "type": "while_loop",
+    "message0": "While %1 do",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "CONDITION",
+        "check": "Boolean"
+      }
+    ],
+    "message1": "%1",
+    "args1": [
+      {
+        "type": "input_statement",
+        "name": "DO"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "While loop",
+    "helpUrl": ""
+  },
+  // 9. Repeat Until Loop Block
+  {
+    "type": "repeat_until_loop",
+    "message0": "Repeat %1 until %2",
+    "args0": [
+      {
+        "type": "input_statement",
+        "name": "DO"
       },
       {
         "type": "input_value",
-        "name": "X",
+        "name": "CONDITION",
+        "check": "Boolean"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "Repeat until loop",
+    "helpUrl": ""
+  },
+  // 10. For Loop Block
+  {
+    "type": "for_loop",
+    "message0": "For %1 = %2 to %3 do",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "VAR_NAME",
+        "text": "i"
+      },
+      {
+        "type": "input_value",
+        "name": "START",
         "check": "Number"
       },
       {
         "type": "input_value",
-        "name": "Y",
+        "name": "END",
         "check": "Number"
-      },
+      }
+    ],
+    "message1": "%1",
+    "args1": [
+      {
+        "type": "input_statement",
+        "name": "DO"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "For loop",
+    "helpUrl": ""
+  },
+  // 11. Math Operation Block
+  {
+    "type": "math_operation",
+    "message0": "%1 %2 %3",
+    "args0": [
       {
         "type": "input_value",
-        "name": "Z",
+        "name": "A",
         "check": "Number"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 230,
-    "tooltip": "Creates a part at the specified position",
-    "helpUrl": ""
-  },
-  // 9. Change Parent Block
-  {
-    "type": "change_parent",
-    "message0": "Set %1's parent to %2",
-    "args0": [
-      {
-        "type": "field_input",
-        "name": "CHILD_NAME",
-        "text": "myPart"
-      },
-      {
-        "type": "field_input",
-        "name": "PARENT_NAME",
-        "text": "workspace"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 290,
-    "tooltip": "Changes the parent of an object",
-    "helpUrl": ""
-  },
-  // 10. Play Sound Block
-  {
-    "type": "play_sound",
-    "message0": "Play sound %1 on %2",
-    "args0": [
-      {
-        "type": "field_input",
-        "name": "SOUND_ID",
-        "text": "rbxassetid://123456789"
-      },
-      {
-        "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
-      }
-    ],
-    "previousStatement": null,
-    "nextStatement": null,
-    "colour": 20,
-    "tooltip": "Plays a sound on the specified object",
-    "helpUrl": ""
-  },
-  // 11. Set Material Block
-  {
-    "type": "set_material",
-    "message0": "Set %1's material to %2",
-    "args0": [
-      {
-        "type": "field_input",
-        "name": "OBJECT_NAME",
-        "text": "myPart"
       },
       {
         "type": "field_dropdown",
-        "name": "MATERIAL",
+        "name": "OP",
         "options": [
-          ["Plastic", "Enum.Material.Plastic"],
-          ["Wood", "Enum.Material.Wood"],
-          ["Metal", "Enum.Material.Metal"],
-          ["Grass", "Enum.Material.Grass"],
-          ["Brick", "Enum.Material.Brick"]
+          ["+", "+"],
+          ["-", "-"],
+          ["*", "*"],
+          ["/", "/"],
+          ["^", "^"]
         ]
+      },
+      {
+        "type": "input_value",
+        "name": "B",
+        "check": "Number"
+      }
+    ],
+    "output": "Number",
+    "colour": 230,
+    "tooltip": "Performs a math operation",
+    "helpUrl": ""
+  },
+  // 12. Comparison Block
+  {
+    "type": "comparison",
+    "message0": "%1 %2 %3",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "A"
+      },
+      {
+        "type": "field_dropdown",
+        "name": "OP",
+        "options": [
+          ["==", "=="],
+          ["~=", "~="],
+          ["<", "<"],
+          ["<=", "<="],
+          [">", ">"],
+          [">=", ">="]
+        ]
+      },
+      {
+        "type": "input_value",
+        "name": "B"
+      }
+    ],
+    "output": "Boolean",
+    "colour": 210,
+    "tooltip": "Performs a comparison",
+    "helpUrl": ""
+  },
+  // 13. Logical Operation Block
+  {
+    "type": "logical_operation",
+    "message0": "%1 %2 %3",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "A",
+        "check": "Boolean"
+      },
+      {
+        "type": "field_dropdown",
+        "name": "OP",
+        "options": [
+          ["and", "and"],
+          ["or", "or"]
+        ]
+      },
+      {
+        "type": "input_value",
+        "name": "B",
+        "check": "Boolean"
+      }
+    ],
+    "output": "Boolean",
+    "colour": 210,
+    "tooltip": "Performs a logical operation",
+    "helpUrl": ""
+  },
+  // 14. Not Operation Block
+  {
+    "type": "not_operation",
+    "message0": "not %1",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "A",
+        "check": "Boolean"
+      }
+    ],
+    "output": "Boolean",
+    "colour": 210,
+    "tooltip": "Logical NOT operation",
+    "helpUrl": ""
+  },
+  // 15. Return Statement Block
+  {
+    "type": "return_statement",
+    "message0": "Return %1",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "VALUE"
       }
     ],
     "previousStatement": null,
-    "nextStatement": null,
-    "colour": 230,
-    "tooltip": "Sets the material of a part",
+    "colour": 290,
+    "tooltip": "Returns a value from a function",
     "helpUrl": ""
   }
 ]);
 
 // Define Lua code generators
 
-// 1. Create Part Generator
-Blockly.Lua['create_part'] = function(block) {
-  var partType = block.getFieldValue('PART_TYPE');
-  var partName = block.getFieldValue('PART_NAME');
-  var code = partName + ' = Instance.new("' + partType + '")\n' +
-             partName + '.Parent = workspace\n';
+// 1. Variable Declaration Generator
+Blockly.Lua['variable_declare'] = function(block) {
+  var varType = block.getFieldValue('VAR_TYPE');
+  var varName = block.getFieldValue('VAR_NAME');
+  var code = varType + ' ' + varName + '\n';
   return code;
 };
 
-// 2. Set Property Generator
-Blockly.Lua['set_property'] = function(block) {
-  var objectName = block.getFieldValue('OBJECT_NAME');
-  var property = block.getFieldValue('PROPERTY');
-  var value = Blockly.Lua.valueToCode(block, 'VALUE', Blockly.Lua.ORDER_NONE);
-
-  // Special handling for certain properties
-  if (property === 'Color') {
-    if (!value.startsWith('Color3.new')) {
-      value = 'Color3.new(' + value + ')';
-    }
-  } else if (property === 'Position' || property === 'Size') {
-    if (!value.startsWith('Vector3.new')) {
-      value = 'Vector3.new(' + value + ')';
-    }
-  }
-
-  var code = objectName + '.' + property + ' = ' + value + '\n';
+// 2. Variable Assignment Generator
+Blockly.Lua['variable_set'] = function(block) {
+  var varName = block.getFieldValue('VAR_NAME');
+  var value = Blockly.Lua.valueToCode(block, 'VALUE', Blockly.Lua.ORDER_NONE) || 'nil';
+  var code = varName + ' = ' + value + '\n';
   return code;
 };
 
-// 3. Move Part Generator
-Blockly.Lua['move_part'] = function(block) {
-  var objectName = block.getFieldValue('OBJECT_NAME');
-  var x = Blockly.Lua.valueToCode(block, 'X', Blockly.Lua.ORDER_NONE) || '0';
-  var y = Blockly.Lua.valueToCode(block, 'Y', Blockly.Lua.ORDER_NONE) || '0';
-  var z = Blockly.Lua.valueToCode(block, 'Z', Blockly.Lua.ORDER_NONE) || '0';
-  var code = objectName + '.Position = ' + objectName + '.Position + Vector3.new(' + x + ', ' + y + ', ' + z + ')\n';
+// 3. Function Definition Generator
+Blockly.Lua['function_definition'] = function(block) {
+  var funcName = block.getFieldValue('FUNC_NAME');
+  var params = block.getFieldValue('PARAMS');
+  var body = Blockly.Lua.statementToCode(block, 'BODY');
+  var code = 'function ' + funcName + '(' + params + ')\n' + body + 'end\n';
   return code;
 };
 
-// 4. On Touch Event Generator
-Blockly.Lua['on_touch'] = function(block) {
-  var objectName = block.getFieldValue('OBJECT_NAME');
-  var statements = Blockly.Lua.statementToCode(block, 'DO');
-  var functionName = Blockly.Lua.nameDB_.getDistinctName(
-    objectName + '_Touched', Blockly.Procedures.NAME_TYPE);
-  var code = 'local function ' + functionName + '(hit)\n' +
-             statements + 'end\n' +
-             objectName + '.Touched:Connect(' + functionName + ')\n';
+// 4. Function Call Generator
+Blockly.Lua['function_call'] = function(block) {
+  var funcName = block.getFieldValue('FUNC_NAME');
+  var args = block.getFieldValue('ARGS');
+  var code = funcName + '(' + args + ')\n';
   return code;
 };
 
-// 5. Wait Generator
-Blockly.Lua['wait'] = function(block) {
-  var seconds = Blockly.Lua.valueToCode(block, 'SECONDS', Blockly.Lua.ORDER_NONE) || '0';
-  var code = 'wait(' + seconds + ')\n';
-  return code;
-};
-
-// 6. Print Generator
+// 5. Print Generator
 Blockly.Lua['print'] = function(block) {
   var text = Blockly.Lua.valueToCode(block, 'TEXT', Blockly.Lua.ORDER_NONE) || '""';
   var code = 'print(' + text + ')\n';
   return code;
 };
 
-// 7. Destroy Object Generator
-Blockly.Lua['destroy_object'] = function(block) {
-  var objectName = block.getFieldValue('OBJECT_NAME');
-  var code = objectName + ':Destroy()\n';
+// 6. If Statement Generator
+Blockly.Lua['if_statement'] = function(block) {
+  var condition = Blockly.Lua.valueToCode(block, 'CONDITION', Blockly.Lua.ORDER_NONE) || 'false';
+  var statements = Blockly.Lua.statementToCode(block, 'THEN');
+  var code = 'if ' + condition + ' then\n' + statements + 'end\n';
   return code;
 };
 
-// 8. Spawn Part Generator
-Blockly.Lua['spawn_part'] = function(block) {
-  var partName = block.getFieldValue('PART_NAME');
-  var x = Blockly.Lua.valueToCode(block, 'X', Blockly.Lua.ORDER_NONE) || '0';
-  var y = Blockly.Lua.valueToCode(block, 'Y', Blockly.Lua.ORDER_NONE) || '0';
-  var z = Blockly.Lua.valueToCode(block, 'Z', Blockly.Lua.ORDER_NONE) || '0';
-  var code = partName + ' = Instance.new("Part")\n' +
-             partName + '.Parent = workspace\n' +
-             partName + '.Position = Vector3.new(' + x + ', ' + y + ', ' + z + ')\n';
+// 7. If-Else Statement Generator
+Blockly.Lua['if_else_statement'] = function(block) {
+  var condition = Blockly.Lua.valueToCode(block, 'CONDITION', Blockly.Lua.ORDER_NONE) || 'false';
+  var thenStatements = Blockly.Lua.statementToCode(block, 'THEN');
+  var elseStatements = Blockly.Lua.statementToCode(block, 'ELSE');
+  var code = 'if ' + condition + ' then\n' + thenStatements + 'else\n' + elseStatements + 'end\n';
   return code;
 };
 
-// 9. Change Parent Generator
-Blockly.Lua['change_parent'] = function(block) {
-  var childName = block.getFieldValue('CHILD_NAME');
-  var parentName = block.getFieldValue('PARENT_NAME');
-  var code = childName + '.Parent = ' + parentName + '\n';
+// 8. While Loop Generator
+Blockly.Lua['while_loop'] = function(block) {
+  var condition = Blockly.Lua.valueToCode(block, 'CONDITION', Blockly.Lua.ORDER_NONE) || 'false';
+  var statements = Blockly.Lua.statementToCode(block, 'DO');
+  var code = 'while ' + condition + ' do\n' + statements + 'end\n';
   return code;
 };
 
-// 10. Play Sound Generator
-Blockly.Lua['play_sound'] = function(block) {
-  var soundId = block.getFieldValue('SOUND_ID');
-  var objectName = block.getFieldValue('OBJECT_NAME');
-  var soundVar = Blockly.Lua.nameDB_.getDistinctName(
-    'sound', Blockly.Variables.NAME_TYPE);
-  var code = soundVar + ' = Instance.new("Sound")\n' +
-             soundVar + '.SoundId = "' + soundId + '"\n' +
-             soundVar + '.Parent = ' + objectName + '\n' +
-             soundVar + ':Play()\n';
+// 9. Repeat Until Loop Generator
+Blockly.Lua['repeat_until_loop'] = function(block) {
+  var statements = Blockly.Lua.statementToCode(block, 'DO');
+  var condition = Blockly.Lua.valueToCode(block, 'CONDITION', Blockly.Lua.ORDER_NONE) || 'false';
+  var code = 'repeat\n' + statements + 'until ' + condition + '\n';
   return code;
 };
 
-// 11. Set Material Generator
-Blockly.Lua['set_material'] = function(block) {
-  var objectName = block.getFieldValue('OBJECT_NAME');
-  var material = block.getFieldValue('MATERIAL');
-  var code = objectName + '.Material = ' + material + '\n';
+// 10. For Loop Generator
+Blockly.Lua['for_loop'] = function(block) {
+  var varName = block.getFieldValue('VAR_NAME');
+  var start = Blockly.Lua.valueToCode(block, 'START', Blockly.Lua.ORDER_NONE) || '0';
+  var end = Blockly.Lua.valueToCode(block, 'END', Blockly.Lua.ORDER_NONE) || '0';
+  var statements = Blockly.Lua.statementToCode(block, 'DO');
+  var code = 'for ' + varName + ' = ' + start + ', ' + end + ' do\n' + statements + 'end\n';
+  return code;
+};
+
+// 11. Math Operation Generator
+Blockly.Lua['math_operation'] = function(block) {
+  var a = Blockly.Lua.valueToCode(block, 'A', Blockly.Lua.ORDER_NONE) || '0';
+  var op = block.getFieldValue('OP');
+  var b = Blockly.Lua.valueToCode(block, 'B', Blockly.Lua.ORDER_NONE) || '0';
+  var code = '(' + a + ' ' + op + ' ' + b + ')';
+  return [code, Blockly.Lua.ORDER_NONE];
+};
+
+// 12. Comparison Generator
+Blockly.Lua['comparison'] = function(block) {
+  var a = Blockly.Lua.valueToCode(block, 'A', Blockly.Lua.ORDER_RELATIONAL) || '0';
+  var op = block.getFieldValue('OP');
+  var b = Blockly.Lua.valueToCode(block, 'B', Blockly.Lua.ORDER_RELATIONAL) || '0';
+  var code = a + ' ' + op + ' ' + b;
+  return [code, Blockly.Lua.ORDER_RELATIONAL];
+};
+
+// 13. Logical Operation Generator
+Blockly.Lua['logical_operation'] = function(block) {
+  var a = Blockly.Lua.valueToCode(block, 'A', Blockly.Lua.ORDER_LOGICAL) || 'false';
+  var op = block.getFieldValue('OP');
+  var b = Blockly.Lua.valueToCode(block, 'B', Blockly.Lua.ORDER_LOGICAL) || 'false';
+  var code = a + ' ' + op + ' ' + b;
+  return [code, Blockly.Lua.ORDER_LOGICAL];
+};
+
+// 14. Not Operation Generator
+Blockly.Lua['not_operation'] = function(block) {
+  var a = Blockly.Lua.valueToCode(block, 'A', Blockly.Lua.ORDER_LOGICAL_NOT) || 'false';
+  var code = 'not ' + a;
+  return [code, Blockly.Lua.ORDER_LOGICAL_NOT];
+};
+
+// 15. Return Statement Generator
+Blockly.Lua['return_statement'] = function(block) {
+  var value = Blockly.Lua.valueToCode(block, 'VALUE', Blockly.Lua.ORDER_NONE) || '';
+  var code = 'return ' + value + '\n';
   return code;
 };
