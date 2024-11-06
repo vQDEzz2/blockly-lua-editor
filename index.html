@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Blockly Studio</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- External Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/blockly.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/blocks.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/lua.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.22.1/ace.js"></script>
+    <!-- Custom Scripts -->
+    <script src="js/blocks.js" defer></script>
+    <script src="js/generators.js" defer></script>
+    <script src="js/toolbox.js" defer></script>
+    <script src="js/workspace.js" defer></script>
+</head>
+<body class="theme-light">
+    <!-- Header/Navigation -->
+    <header class="header">
+        <div class="header-left">
+            <img src="assets/logo.png" alt="Roblox Blockly" class="logo">
+            <h1>Roblox Blockly Studio</h1>
+        </div>
+        <div class="header-center">
+            <button class="btn primary" onclick="generateCode()">
+                <span class="icon">⚡</span> Generate Code
+            </button>
+            <button class="btn success" onclick="saveProject()">
+                <span class="icon">💾</span> Save
+            </button>
+            <button class="btn warning" onclick="loadProject()">
+                <span class="icon">📂</span> Load
+            </button>
+            <button class="btn" onclick="shareProject()">
+                <span class="icon">🔗</span> Share
+            </button>
+        </div>
+        <div class="header-right">
+            <button class="btn icon-btn" onclick="toggleTheme()" title="Toggle Theme">
+                <span class="icon">🌓</span>
+            </button>
+            <button class="btn icon-btn" onclick="toggleFullscreen()" title="Toggle Fullscreen">
+                <span class="icon">⛶</span>
+            </button>
+            <a href="https://github.com/yourusername/roblox-blockly" target="_blank" 
+               class="btn icon-btn" title="View on GitHub">
+                <span class="icon">📦</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="workspace-container">
+            <div id="blocklyDiv"></div>
+            <div class="editor-panel">
+                <div class="editor-tabs">
+                    <button class="tab-btn active" data-tab="lua">Lua Code</button>
+                    <button class="tab-btn" data-tab="console">Console</button>
+                    <button class="tab-btn" data-tab="preview">Preview</button>
+                </div>
+                <div class="editor-content">
+                    <div id="luaEditor" class="tab-content active"></div>
+                    <div id="consoleOutput" class="tab-content console-output"></div>
+                    <div id="preview" class="tab-content preview-panel">
+                        <div class="preview-placeholder">
+                            <span class="icon">🎮</span>
+                            <p>Preview coming soon...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toolbox Definition -->
+    <xml id="toolbox" style="display: none">
+        <category name="Roblox" colour="#FF4444">
+            <label text="Basic"></label>
+            <block type="roblox_print"></block>
+            <block type="roblox_wait"></block>
+            <block type="roblox_comment"></block>
+            <label text="Instance Creation"></label>
+            <block type="roblox_part_create"></block>
+            <block type="roblox_model_create"></block>
+            <label text="Properties"></label>
+            <block type="roblox_set_property"></block>
+            <block type="roblox_get_property"></block>
+        </category>
+        <category name="Events" colour="#4CAF50">
+            <block type="roblox_on_touched"></block>
+            <block type="roblox_on_player_added"></block>
+            <block type="roblox_on_input"></block>
+        </category>
+        <category name="Game" colour="#2196F3">
+            <block type="roblox_get_service"></block>
+            <block type="roblox_find_first_child"></block>
+            <block type="roblox_clone"></block>
+        </category>
+        <category name="Math" colour="#9C27B0">
+            <block type="roblox_vector3"></block>
+            <block type="roblox_color3"></block>
+            <block type="math_number"></block>
+            <block type="math_arithmetic"></block>
+        </category>
+        <category name="Logic" colour="#FF9800">
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+        </category>
+        <category name="Loops" colour="#795548">
+            <block type="controls_repeat_ext"></block>
+            <block type="controls_whileUntil"></block>
+            <block type="controls_for"></block>
+        </category>
+        <category name="Variables" custom="VARIABLE" colour="#607D8B"></category>
+        <category name="Functions" custom="PROCEDURE" colour="#9E9E9E"></category>
+    </xml>
+
+    <!-- Modals -->
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <h2>Share Project</h2>
+            <p>Copy this link to share your project:</p>
+            <div class="share-link-container">
+                <input type="text" id="shareLink" readonly>
+                <button class="btn" onclick="copyShareLink()">Copy</button>
+            </div>
+            <button class="btn" onclick="closeModal('shareModal')">Close</button>
+        </div>
+    </div>
+
+    <!-- Tutorial Modal -->
+    <div id="tutorialModal" class="modal">
+        <div class="modal-content">
+            <h2>Welcome to Roblox Blockly Studio!</h2>
+            <div class="tutorial-steps">
+                <div class="tutorial-step">
+                    <span class="step-number">1</span>
+                    <p>Drag blocks from the toolbox on the left</p>
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">2</span>
+                    <p>Connect blocks to create your program</p>
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">3</span>
+                    <p>Click "Generate Code" to see the Lua code</p>
+                </div>
+                <div class="tutorial-step">
+                    <span class="step-number">4</span>
+                    <p>Save your work using the Save button</p>
+                </div>
+            </div>
+            <label class="checkbox-label">
+                <input type="checkbox" id="dontShowAgain">
+                Don't show this again
+            </label>
+            <button class="btn primary" onclick="closeTutorial()">Get Started</button>
+        </div>
+    </div>
+</body>
+</html>
