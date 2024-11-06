@@ -3,80 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lua Block Programming</title>
+    <title>Lua Block Programming Game</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/blockly.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/blocks.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/lua.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <style>
         body {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #2d2d2d;
+        }
+        .header {
+            background: #333;
+            color: white;
+            padding: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
         #blocklyDiv {
-            height: 600px;
+            flex: 1;
+            height: 100%;
+        }
+        .game-container {
+            width: 400px;
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+            border-left: 2px solid #444;
+        }
+        #gameCanvas {
             width: 100%;
+            height: 300px;
+            background: #000;
         }
         .controls {
             padding: 1rem;
-            background: #f0f0f0;
-            border-bottom: 1px solid #ddd;
+            background: #333;
+            display: flex;
+            gap: 0.5rem;
+        }
+        .sprite-list {
+            padding: 1rem;
+            color: white;
+            flex: 1;
+            overflow-y: auto;
+        }
+        .sprite-item {
+            padding: 0.5rem;
+            background: #444;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .sprite-item:hover {
+            background: #555;
         }
         #codeOutput {
             padding: 1rem;
-            background: #2d2d2d;
+            background: #1e1e1e;
             color: #fff;
             font-family: monospace;
             white-space: pre;
-            overflow-x: auto;
+            height: 150px;
+            overflow-y: auto;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .tab-container {
+            display: flex;
+            background: #333;
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            color: white;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            background: #444;
+            border-bottom-color: #4CAF50;
         }
     </style>
 </head>
 <body>
-    <div class="controls">
-        <button onclick="generateCode()">Generate Lua Code</button>
-        <button onclick="runCode()">Run Code</button>
+    <div class="header">
+        <h1>Lua Block Game Builder</h1>
+        <div>
+            <button onclick="saveProject()">Save Project</button>
+            <button onclick="loadProject()">Load Project</button>
+        </div>
     </div>
-    <div id="blocklyDiv"></div>
-    <div id="codeOutput"></div>
+    <div class="main-container">
+        <div id="blocklyDiv"></div>
+        <div class="game-container">
+            <canvas id="gameCanvas"></canvas>
+            <div class="tab-container">
+                <div class="tab active" onclick="switchTab(this, 'sprites')">Sprites</div>
+                <div class="tab" onclick="switchTab(this, 'properties')">Properties</div>
+            </div>
+            <div class="controls">
+                <button onclick="runGame()">▶ Run Game</button>
+                <button onclick="stopGame()">⬛ Stop</button>
+                <button onclick="addSprite()">+ Add Sprite</button>
+            </div>
+            <div class="sprite-list" id="spriteList">
+                <!-- Sprites will be listed here -->
+            </div>
+            <div id="codeOutput"></div>
+        </div>
+    </div>
 
     <xml id="toolbox" style="display: none">
-        <category name="Logic" colour="%{BKY_LOGIC_HUE}">
-            <block type="controls_if"></block>
-            <block type="logic_compare"></block>
-            <block type="logic_operation"></block>
-            <block type="logic_negate"></block>
+        <category name="Events" colour="#FFD700">
+            <block type="event_game_start"></block>
+            <block type="event_sprite_clicked"></block>
+            <block type="event_key_pressed"></block>
         </category>
-        <category name="Loops" colour="%{BKY_LOOPS_HUE}">
-            <block type="controls_repeat_ext"></block>
-            <block type="controls_whileUntil"></block>
-            <block type="controls_for"></block>
+        <category name="Motion" colour="#4C97FF">
+            <block type="motion_move_steps">
+                <value name="STEPS">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="motion_goto_xy">
+                <value name="X">
+                    <shadow type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+                <value name="Y">
+                    <shadow type="math_number">
+                        <field name="NUM">0</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="motion_rotate"></block>
         </category>
-        <category name="Math" colour="%{BKY_MATH_HUE}">
-            <block type="math_number"></block>
-            <block type="math_arithmetic"></block>
-            <block type="math_single"></block>
+        <category name="Looks" colour="#9966FF">
+            <block type="looks_say">
+                <value name="MESSAGE">
+                    <shadow type="text">
+                        <field name="TEXT">Hello!</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="looks_change_costume"></block>
+            <block type="looks_set_size">
+                <value name="SIZE">
+                    <shadow type="math_number">
+                        <field name="NUM">100</field>
+                    </shadow>
+                </value>
+            </block>
         </category>
-        <category name="Text" colour="%{BKY_TEXTS_HUE}">
-            <block type="text"></block>
-            <block type="text_print"></block>
-            <block type="text_join"></block>
-        </category>
-        <category name="Roblox" colour="#FF4F4F">
-            <block type="roblox_wait">
-                <value name="SECONDS">
+        <category name="Control" colour="#FF8C1A">
+            <block type="control_repeat">
+                <value name="TIMES">
+                    <shadow type="math_number">
+                        <field name="NUM">10</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="control_if"></block>
+            <block type="control_wait">
+                <value name="DURATION">
                     <shadow type="math_number">
                         <field name="NUM">1</field>
                     </shadow>
                 </value>
             </block>
-            <block type="roblox_print"></block>
-            <block type="roblox_get_player"></block>
-            <block type="roblox_move_player"></block>
+        </category>
+        <category name="Physics" colour="#FF6680">
+            <block type="physics_apply_force"></block>
+            <block type="physics_set_gravity"></block>
+            <block type="physics_set_collision"></block>
+        </category>
+        <category name="Variables" custom="VARIABLE" colour="#FF8C1A"></category>
+        <category name="Game" colour="#FF4F4F">
+            <block type="game_score"></block>
+            <block type="game_level"></block>
+            <block type="game_reset"></block>
         </category>
     </xml>
 
     <script>
+        // Initialize game engine
+        const engine = Matter.Engine.create();
+        const world = engine.world;
+        const render = Matter.Render.create({
+            canvas: document.getElementById('gameCanvas'),
+            engine: engine,
+            options: {
+                width: 400,
+                height: 300,
+                wireframes: false,
+                background: '#000'
+            }
+        });
+
+        Matter.Render.run(render);
+        const runner = Matter.Runner.create();
+        Matter.Runner.run(runner, engine);
+
+        // Game state
+        const gameState = {
+            sprites: [],
+            running: false,
+            score: 0,
+            level: 1
+        };
+
         // Initialize Blockly
         const workspace = Blockly.inject('blocklyDiv', {
             toolbox: document.getElementById('toolbox'),
@@ -97,96 +255,136 @@
             trashcan: true
         });
 
-        // Define custom Roblox-like blocks
-        Blockly.Blocks['roblox_wait'] = {
-            init: function() {
-                this.appendValueInput('SECONDS')
-                    .setCheck('Number')
-                    .appendField('wait');
-                this.setPreviousStatement(true, null);
-                this.setNextStatement(true, null);
-                this.setColour('#FF4F4F');
-                this.setTooltip('Waits for the specified number of seconds');
-            }
-        };
-
-        Blockly.Blocks['roblox_print'] = {
-            init: function() {
-                this.appendValueInput('MESSAGE')
-                    .setCheck(null)
-                    .appendField('print');
-                this.setPreviousStatement(true, null);
-                this.setNextStatement(true, null);
-                this.setColour('#FF4F4F');
-                this.setTooltip('Prints a message to the output');
-            }
-        };
-
-        Blockly.Blocks['roblox_get_player'] = {
+        // Custom block definitions
+        Blockly.Blocks['event_game_start'] = {
             init: function() {
                 this.appendDummyInput()
-                    .appendField('get local player');
-                this.setOutput(true, null);
-                this.setColour('#FF4F4F');
-                this.setTooltip('Gets the local player');
+                    .appendField("when game starts");
+                this.setNextStatement(true, null);
+                this.setColour('#FFD700');
             }
         };
 
-        Blockly.Blocks['roblox_move_player'] = {
+        Blockly.Blocks['event_sprite_clicked'] = {
             init: function() {
-                this.appendValueInput('PLAYER')
-                    .setCheck(null)
-                    .appendField('move player');
-                this.appendValueInput('X')
-                    .setCheck('Number')
-                    .appendField('x');
-                this.appendValueInput('Y')
-                    .setCheck('Number')
-                    .appendField('y');
-                this.appendValueInput('Z')
-                    .setCheck('Number')
-                    .appendField('z');
+                this.appendDummyInput()
+                    .appendField("when sprite clicked");
+                this.setNextStatement(true, null);
+                this.setColour('#FFD700');
+            }
+        };
+
+        Blockly.Blocks['motion_move_steps'] = {
+            init: function() {
+                this.appendValueInput("STEPS")
+                    .setCheck("Number")
+                    .appendField("move")
+                    .appendField(new Blockly.FieldNumber(10), "STEPS")
+                    .appendField("steps");
                 this.setPreviousStatement(true, null);
                 this.setNextStatement(true, null);
-                this.setColour('#FF4F4F');
-                this.setTooltip('Moves the player to specified coordinates');
+                this.setColour('#4C97FF');
             }
         };
 
-        // Define Lua code generators for custom blocks
-        Blockly.Lua['roblox_wait'] = function(block) {
-            const seconds = Blockly.Lua.valueToCode(block, 'SECONDS', Blockly.Lua.ORDER_ATOMIC) || '0';
-            return `wait(${seconds})\n`;
-        };
+        // Add more block definitions here...
 
-        Blockly.Lua['roblox_print'] = function(block) {
-            const message = Blockly.Lua.valueToCode(block, 'MESSAGE', Blockly.Lua.ORDER_ATOMIC) || "''";
-            return `print(${message})\n`;
-        };
-
-        Blockly.Lua['roblox_get_player'] = function(block) {
-            return ['game.Players.LocalPlayer', Blockly.Lua.ORDER_ATOMIC];
-        };
-
-        Blockly.Lua['roblox_move_player'] = function(block) {
-            const player = Blockly.Lua.valueToCode(block, 'PLAYER', Blockly.Lua.ORDER_ATOMIC) || 'game.Players.LocalPlayer';
-            const x = Blockly.Lua.valueToCode(block, 'X', Blockly.Lua.ORDER_ATOMIC) || '0';
-            const y = Blockly.Lua.valueToCode(block, 'Y', Blockly.Lua.ORDER_ATOMIC) || '0';
-            const z = Blockly.Lua.valueToCode(block, 'Z', Blockly.Lua.ORDER_ATOMIC) || '0';
-            return `${player}.Character:MoveTo(Vector3.new(${x}, ${y}, ${z}))\n`;
-        };
-
-        function generateCode() {
+        // Game functions
+        function runGame() {
+            gameState.running = true;
             const code = Blockly.Lua.workspaceToCode(workspace);
             document.getElementById('codeOutput').textContent = code;
+            // Execute game logic here
         }
 
-        function runCode() {
-            const code = Blockly.Lua.workspaceToCode(workspace);
-            // In a real implementation, this would run the Lua code
-            alert('Code execution is simulated. In a real environment, this would run the Lua code.');
-            console.log('Generated Lua code:', code);
+        function stopGame() {
+            gameState.running = false;
+            // Stop game logic here
         }
+
+        function addSprite() {
+            const sprite = {
+                id: Date.now(),
+                name: `Sprite ${gameState.sprites.length + 1}`,
+                x: 200,
+                y: 150,
+                body: Matter.Bodies.rectangle(200, 150, 30, 30, {
+                    render: {
+                        fillStyle: '#F35e66'
+                    }
+                })
+            };
+
+            Matter.World.add(world, sprite.body);
+            gameState.sprites.push(sprite);
+            updateSpriteList();
+        }
+
+        function updateSpriteList() {
+            const spriteList = document.getElementById('spriteList');
+            spriteList.innerHTML = gameState.sprites.map(sprite => `
+                <div class="sprite-item" onclick="selectSprite(${sprite.id})">
+                    ${sprite.name}
+                </div>
+            `).join('');
+        }
+
+        function selectSprite(id) {
+            const sprite = gameState.sprites.find(s => s.id === id);
+            // Show sprite properties
+            console.log('Selected sprite:', sprite);
+        }
+
+        function switchTab(element, tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            element.classList.add('active');
+            // Switch tab content
+        }
+
+        function saveProject() {
+            const projectData = {
+                blocks: Blockly.serialization.workspaces.save(workspace),
+                sprites: gameState.sprites
+            };
+            const blob = new Blob([JSON.stringify(projectData)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'game-project.json';
+            a.click();
+        }
+
+        function loadProject() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    const projectData = JSON.parse(event.target.result);
+                    Blockly.serialization.workspaces.load(projectData.blocks, workspace);
+                    gameState.sprites = projectData.sprites;
+                    updateSpriteList();
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // Initialize the game
+        function init() {
+            // Add ground
+            const ground = Matter.Bodies.rectangle(200, 290, 400, 20, {
+                isStatic: true,
+                render: {
+                    fillStyle: '#666'
+                }
+            });
+            Matter.World.add(world, ground);
+        }
+
+        init();
     </script>
 </body>
 </html>
