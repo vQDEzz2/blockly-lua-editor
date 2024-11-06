@@ -8,78 +8,103 @@
     
     <!-- Blockly Core -->
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
-    
-    <!-- Blockly Blocks -->
     <script src="https://unpkg.com/blockly/blocks/blocks.min.js"></script>
-    
-    <!-- Blockly Language Generators -->
-    <script src="https://unpkg.com/blockly/javascript/javascript.js"></script>
     <script src="https://unpkg.com/blockly/lua/lua.js"></script>
     
     <!-- Ace Editor -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.22.1/ace.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.22.1/mode-lua.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.22.1/theme-monokai.js"></script>
-    
-    <!-- Custom Scripts -->
-    <script src="js/blocks.js" defer></script>
-    <script src="js/generators.js" defer></script>
-    <script src="js/toolbox.js" defer></script>
-    <script src="js/workspace.js" defer></script>
 </head>
 <body class="theme-light">
-    <!-- Rest of your HTML remains the same -->
-    <div id="blocklyDiv" style="height: 480px; width: 100%;"></div>
-    <div id="luaOutput" style="height: 200px; width: 100%;"></div>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1>Roblox Blockly Studio</h1>
+        </div>
+        <div class="header-center">
+            <button class="btn primary" onclick="generateCode()">
+                <span class="icon">⚡</span> Generate Code
+            </button>
+            <button class="btn success" onclick="saveProject()">
+                <span class="icon">💾</span> Save
+            </button>
+            <button class="btn warning" onclick="loadProject()">
+                <span class="icon">📂</span> Load
+            </button>
+        </div>
+        <div class="header-right">
+            <button class="btn icon-btn" onclick="toggleTheme()" title="Toggle Theme">
+                <span class="icon">🌓</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="workspace-container">
+            <div id="blocklyDiv"></div>
+            <div class="editor-panel">
+                <div class="editor-tabs">
+                    <button class="tab-btn active" data-tab="lua">Lua Code</button>
+                    <button class="tab-btn" data-tab="console">Console</button>
+                </div>
+                <div class="editor-content">
+                    <div id="luaEditor" class="tab-content active"></div>
+                    <div id="consoleOutput" class="tab-content console-output"></div>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <!-- Toolbox Definition -->
     <xml id="toolbox" style="display: none">
         <category name="Roblox" colour="#FF4444">
             <block type="roblox_print"></block>
             <block type="roblox_wait"></block>
+            <block type="roblox_comment"></block>
+            <block type="roblox_part_create"></block>
+            <block type="roblox_part_properties"></block>
         </category>
-        <!-- Add more categories as needed -->
+        <category name="Events" colour="#4CAF50">
+            <block type="roblox_on_touched"></block>
+            <block type="roblox_on_player_added"></block>
+            <block type="roblox_on_input"></block>
+        </category>
+        <category name="Game" colour="#2196F3">
+            <block type="roblox_get_service"></block>
+        </category>
+        <category name="Logic" colour="%{BKY_LOGIC_HUE}">
+            <block type="controls_if"></block>
+            <block type="logic_compare"></block>
+            <block type="logic_operation"></block>
+        </category>
+        <category name="Loops" colour="%{BKY_LOOPS_HUE}">
+            <block type="controls_repeat_ext"></block>
+            <block type="controls_whileUntil"></block>
+            <block type="controls_for"></block>
+        </category>
+        <category name="Math" colour="%{BKY_MATH_HUE}">
+            <block type="math_number"></block>
+            <block type="math_arithmetic"></block>
+        </category>
+        <category name="Variables" custom="VARIABLE" colour="%{BKY_VARIABLES_HUE}">
+        </category>
+        <category name="Functions" custom="PROCEDURE" colour="%{BKY_PROCEDURES_HUE}">
+        </category>
     </xml>
+
+    <!-- Custom Scripts -->
+    <script src="js/blocks.js"></script>
+    <script src="js/generators.js"></script>
+    <script src="js/toolbox.js"></script>
+    <script src="js/workspace.js"></script>
 
     <script>
         // Initialize workspace when page loads
         window.addEventListener('load', function() {
-            // Create main workspace
-            const workspace = Blockly.inject('blocklyDiv', {
-                toolbox: document.getElementById('toolbox'),
-                grid: {
-                    spacing: 20,
-                    length: 3,
-                    colour: '#ccc',
-                    snap: true
-                },
-                zoom: {
-                    controls: true,
-                    wheel: true,
-                    startScale: 1.0,
-                    maxScale: 3,
-                    minScale: 0.3,
-                    scaleSpeed: 1.2
-                },
-                trashcan: true
-            });
-
-            // Initialize Ace editor for Lua output
-            const editor = ace.edit("luaOutput");
-            editor.setTheme("ace/theme/monokai");
-            editor.session.setMode("ace/mode/lua");
-            editor.setReadOnly(true);
-
-            // Add change listener to update Lua code
-            workspace.addChangeListener(function() {
-                try {
-                    const code = Blockly.Lua.workspaceToCode(workspace);
-                    editor.setValue(code, -1);
-                } catch (e) {
-                    console.error('Error generating code:', e);
-                    editor.setValue('// Error generating code: ' + e.message);
-                }
-            });
+            const workspaceManager = new WorkspaceManager();
+            workspaceManager.init();
         });
     </script>
 </body>
