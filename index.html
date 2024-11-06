@@ -1,129 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Blockly Example</title>
-    <!-- Blockly Core -->
-    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
-    <!-- Optional: Use specific language generators -->
-    <script src="https://unpkg.com/blockly/javascript_compressed.js"></script>
-    <script src="https://unpkg.com/blockly/python_compressed.js"></script>
-    <script src="https://unpkg.com/blockly/lua_compressed.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lua Block Programming</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/blockly.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/blocks.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/lua.min.js"></script>
     <style>
         body {
             margin: 0;
-            max-width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        #blocklyArea {
-            flex-grow: 1;
-            display: flex;
+            padding: 0;
+            font-family: Arial, sans-serif;
         }
         #blocklyDiv {
-            flex-grow: 1;
-            height: 100%;
+            height: 600px;
+            width: 100%;
         }
-        #outputArea {
-            height: 200px;
-            overflow: auto;
-            padding: 1em;
-            background-color: #f0f0f0;
+        .controls {
+            padding: 1rem;
+            background: #f0f0f0;
+            border-bottom: 1px solid #ddd;
+        }
+        #codeOutput {
+            padding: 1rem;
+            background: #2d2d2d;
+            color: #fff;
+            font-family: monospace;
+            white-space: pre;
+            overflow-x: auto;
         }
     </style>
 </head>
 <body>
-    <div>
-        <button onclick="generateCode('JavaScript')">Generate JavaScript</button>
-        <button onclick="generateCode('Python')">Generate Python</button>
-        <button onclick="generateCode('Lua')">Generate Lua</button>
-        <button onclick="runCode()">Run JavaScript</button>
+    <div class="controls">
+        <button onclick="generateCode()">Generate Lua Code</button>
+        <button onclick="runCode()">Run Code</button>
     </div>
-    <div id="blocklyArea">
-        <div id="blocklyDiv"></div>
-    </div>
-    <div id="outputArea">
-        <pre id="codeOutput"></pre>
-        <hr>
-        <div id="output"></div>
-    </div>
+    <div id="blocklyDiv"></div>
+    <div id="codeOutput"></div>
 
-    <!-- Toolbox Definition -->
     <xml id="toolbox" style="display: none">
         <category name="Logic" colour="%{BKY_LOGIC_HUE}">
             <block type="controls_if"></block>
             <block type="logic_compare"></block>
             <block type="logic_operation"></block>
             <block type="logic_negate"></block>
-            <block type="logic_boolean"></block>
         </category>
         <category name="Loops" colour="%{BKY_LOOPS_HUE}">
-            <block type="controls_repeat_ext">
-                <value name="TIMES">
-                    <shadow type="math_number">
-                        <field name="NUM">10</field>
-                    </shadow>
-                </value>
-            </block>
+            <block type="controls_repeat_ext"></block>
             <block type="controls_whileUntil"></block>
-            <block type="controls_for">
-                <value name="FROM">
-                    <shadow type="math_number">
-                        <field name="NUM">1</field>
-                    </shadow>
-                </value>
-                <value name="TO">
-                    <shadow type="math_number">
-                        <field name="NUM">10</field>
-                    </shadow>
-                </value>
-                <value name="BY">
-                    <shadow type="math_number">
-                        <field name="NUM">1</field>
-                    </shadow>
-                </value>
-            </block>
+            <block type="controls_for"></block>
         </category>
         <category name="Math" colour="%{BKY_MATH_HUE}">
-            <block type="math_number">
-                <field name="NUM">123</field>
-            </block>
-            <block type="math_arithmetic">
-                <value name="A">
-                    <shadow type="math_number">
-                        <field name="NUM">1</field>
-                    </shadow>
-                </value>
-                <value name="B">
-                    <shadow type="math_number">
-                        <field name="NUM">1</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="math_single">
-                <value name="NUM">
-                    <shadow type="math_number">
-                        <field name="NUM">9</field>
-                    </shadow>
-                </value>
-            </block>
+            <block type="math_number"></block>
+            <block type="math_arithmetic"></block>
+            <block type="math_single"></block>
         </category>
         <category name="Text" colour="%{BKY_TEXTS_HUE}">
             <block type="text"></block>
             <block type="text_print"></block>
-            <block type="text_length"></block>
             <block type="text_join"></block>
         </category>
-        <category name="Variables" custom="VARIABLE" colour="%{BKY_VARIABLES_HUE}">
-        </category>
-        <category name="Functions" custom="PROCEDURE" colour="%{BKY_PROCEDURES_HUE}">
+        <category name="Roblox" colour="#FF4F4F">
+            <block type="roblox_wait">
+                <value name="SECONDS">
+                    <shadow type="math_number">
+                        <field name="NUM">1</field>
+                    </shadow>
+                </value>
+            </block>
+            <block type="roblox_print"></block>
+            <block type="roblox_get_player"></block>
+            <block type="roblox_move_player"></block>
         </category>
     </xml>
 
     <script>
-        // Initialize Blockly workspace
-        var workspace = Blockly.inject('blocklyDiv', {
+        // Initialize Blockly
+        const workspace = Blockly.inject('blocklyDiv', {
             toolbox: document.getElementById('toolbox'),
             grid: {
                 spacing: 20,
@@ -142,59 +97,96 @@
             trashcan: true
         });
 
-        // Generate code in selected language
-        function generateCode(lang) {
-            var code;
-            switch(lang) {
-                case 'JavaScript':
-                    code = Blockly.JavaScript.workspaceToCode(workspace);
-                    break;
-                case 'Python':
-                    code = Blockly.Python.workspaceToCode(workspace);
-                    break;
-                case 'Lua':
-                    code = Blockly.Lua.workspaceToCode(workspace);
-                    break;
-                default:
-                    code = 'Language not supported.';
+        // Define custom Roblox-like blocks
+        Blockly.Blocks['roblox_wait'] = {
+            init: function() {
+                this.appendValueInput('SECONDS')
+                    .setCheck('Number')
+                    .appendField('wait');
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour('#FF4F4F');
+                this.setTooltip('Waits for the specified number of seconds');
             }
-            document.getElementById('codeOutput').innerText = code;
+        };
+
+        Blockly.Blocks['roblox_print'] = {
+            init: function() {
+                this.appendValueInput('MESSAGE')
+                    .setCheck(null)
+                    .appendField('print');
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour('#FF4F4F');
+                this.setTooltip('Prints a message to the output');
+            }
+        };
+
+        Blockly.Blocks['roblox_get_player'] = {
+            init: function() {
+                this.appendDummyInput()
+                    .appendField('get local player');
+                this.setOutput(true, null);
+                this.setColour('#FF4F4F');
+                this.setTooltip('Gets the local player');
+            }
+        };
+
+        Blockly.Blocks['roblox_move_player'] = {
+            init: function() {
+                this.appendValueInput('PLAYER')
+                    .setCheck(null)
+                    .appendField('move player');
+                this.appendValueInput('X')
+                    .setCheck('Number')
+                    .appendField('x');
+                this.appendValueInput('Y')
+                    .setCheck('Number')
+                    .appendField('y');
+                this.appendValueInput('Z')
+                    .setCheck('Number')
+                    .appendField('z');
+                this.setPreviousStatement(true, null);
+                this.setNextStatement(true, null);
+                this.setColour('#FF4F4F');
+                this.setTooltip('Moves the player to specified coordinates');
+            }
+        };
+
+        // Define Lua code generators for custom blocks
+        Blockly.Lua['roblox_wait'] = function(block) {
+            const seconds = Blockly.Lua.valueToCode(block, 'SECONDS', Blockly.Lua.ORDER_ATOMIC) || '0';
+            return `wait(${seconds})\n`;
+        };
+
+        Blockly.Lua['roblox_print'] = function(block) {
+            const message = Blockly.Lua.valueToCode(block, 'MESSAGE', Blockly.Lua.ORDER_ATOMIC) || "''";
+            return `print(${message})\n`;
+        };
+
+        Blockly.Lua['roblox_get_player'] = function(block) {
+            return ['game.Players.LocalPlayer', Blockly.Lua.ORDER_ATOMIC];
+        };
+
+        Blockly.Lua['roblox_move_player'] = function(block) {
+            const player = Blockly.Lua.valueToCode(block, 'PLAYER', Blockly.Lua.ORDER_ATOMIC) || 'game.Players.LocalPlayer';
+            const x = Blockly.Lua.valueToCode(block, 'X', Blockly.Lua.ORDER_ATOMIC) || '0';
+            const y = Blockly.Lua.valueToCode(block, 'Y', Blockly.Lua.ORDER_ATOMIC) || '0';
+            const z = Blockly.Lua.valueToCode(block, 'Z', Blockly.Lua.ORDER_ATOMIC) || '0';
+            return `${player}.Character:MoveTo(Vector3.new(${x}, ${y}, ${z}))\n`;
+        };
+
+        function generateCode() {
+            const code = Blockly.Lua.workspaceToCode(workspace);
+            document.getElementById('codeOutput').textContent = code;
         }
 
-        // Run JavaScript code
         function runCode() {
-            // Get generated code
-            var code = Blockly.JavaScript.workspaceToCode(workspace);
-            
-            // Create a function to capture outputs
-            var outputArea = document.getElementById('output');
-            var originalConsoleLog = console.log;
-            console.log = function(msg) {
-                outputArea.innerHTML += msg + '<br>';
-                originalConsoleLog.apply(console, arguments);
-            };
-            
-            // Clear previous output
-            outputArea.innerHTML = '';
-            
-            try {
-                eval(code);
-            } catch (e) {
-                console.log('Error: ' + e);
-            }
-            
-            // Restore original console.log
-            console.log = originalConsoleLog;
+            const code = Blockly.Lua.workspaceToCode(workspace);
+            // In a real implementation, this would run the Lua code
+            alert('Code execution is simulated. In a real environment, this would run the Lua code.');
+            console.log('Generated Lua code:', code);
         }
-
-        // Add workspace change listener for auto-generation
-        workspace.addChangeListener(function(event) {
-            if (event.type == Blockly.Events.CHANGE || 
-                event.type == Blockly.Events.MOVE || 
-                event.type == Blockly.Events.DELETE) {
-                generateCode('JavaScript');
-            }
-        });
     </script>
 </body>
 </html>
