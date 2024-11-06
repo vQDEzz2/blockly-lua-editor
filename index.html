@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lua Block Programming Game</title>
+    <title>Enhanced Lua Block Programming Game</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/blockly.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/blocks.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/blockly/9.3.3/lua.min.js"></script>
@@ -19,12 +19,13 @@
             background: #2d2d2d;
         }
         .header {
-            background: #333;
+            background: #1a1a1a;
             color: white;
-            padding: 0.5rem;
+            padding: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 2px solid #4CAF50;
         }
         .main-container {
             display: flex;
@@ -36,7 +37,7 @@
             height: 100%;
         }
         .game-container {
-            width: 400px;
+            width: 450px;
             background: #1e1e1e;
             display: flex;
             flex-direction: column;
@@ -44,7 +45,7 @@
         }
         #gameCanvas {
             width: 100%;
-            height: 300px;
+            height: 400px;
             background: #000;
         }
         .controls {
@@ -52,31 +53,7 @@
             background: #333;
             display: flex;
             gap: 0.5rem;
-        }
-        .sprite-list {
-            padding: 1rem;
-            color: white;
-            flex: 1;
-            overflow-y: auto;
-        }
-        .sprite-item {
-            padding: 0.5rem;
-            background: #444;
-            margin-bottom: 0.5rem;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .sprite-item:hover {
-            background: #555;
-        }
-        #codeOutput {
-            padding: 1rem;
-            background: #1e1e1e;
-            color: #fff;
-            font-family: monospace;
-            white-space: pre;
-            height: 150px;
-            overflow-y: auto;
+            flex-wrap: wrap;
         }
         button {
             background: #4CAF50;
@@ -85,306 +62,675 @@
             padding: 0.5rem 1rem;
             border-radius: 4px;
             cursor: pointer;
+            transition: background 0.3s;
         }
         button:hover {
             background: #45a049;
         }
-        .tab-container {
-            display: flex;
+        .tab-button {
             background: #333;
         }
-        .tab {
-            padding: 0.5rem 1rem;
-            color: white;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
+        .tab-button.active {
+            background: #4CAF50;
         }
-        .tab.active {
+        #codeOutput {
+            padding: 1rem;
+            background: #1a1a1a;
+            color: #fff;
+            font-family: monospace;
+            white-space: pre;
+            height: 200px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        .sprite-panel {
+            padding: 1rem;
+            background: #262626;
+            color: white;
+        }
+        .sprite-list {
+            margin-top: 1rem;
+            display: grid;
+            gap: 0.5rem;
+        }
+        .sprite-item {
+            background: #333;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sprite-item:hover {
             background: #444;
-            border-bottom-color: #4CAF50;
+        }
+        .properties-panel {
+            padding: 1rem;
+            color: white;
+        }
+        .property-group {
+            margin-bottom: 1rem;
+        }
+        .property-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #aaa;
+        }
+        .property-input {
+            width: 100%;
+            padding: 0.5rem;
+            background: #333;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Lua Block Game Builder</h1>
+        <h1>Enhanced Lua Block Game Builder</h1>
         <div>
-            <button onclick="saveProject()">Save Project</button>
-            <button onclick="loadProject()">Load Project</button>
+            <button onclick="saveProject()">💾 Save Project</button>
+            <button onclick="loadProject()">📂 Load Project</button>
+            <button onclick="exportLua()">📤 Export Lua</button>
         </div>
     </div>
     <div class="main-container">
         <div id="blocklyDiv"></div>
         <div class="game-container">
             <canvas id="gameCanvas"></canvas>
-            <div class="tab-container">
-                <div class="tab active" onclick="switchTab(this, 'sprites')">Sprites</div>
-                <div class="tab" onclick="switchTab(this, 'properties')">Properties</div>
-            </div>
             <div class="controls">
                 <button onclick="runGame()">▶ Run Game</button>
+                <button onclick="pauseGame()">⏸ Pause</button>
                 <button onclick="stopGame()">⬛ Stop</button>
-                <button onclick="addSprite()">+ Add Sprite</button>
+                <button onclick="resetGame()">🔄 Reset</button>
+                <button onclick="addSprite()">➕ Add Sprite</button>
+                <button onclick="toggleDebug()">🐞 Debug View</button>
             </div>
-            <div class="sprite-list" id="spriteList">
-                <!-- Sprites will be listed here -->
+            <div class="tab-container">
+                <button class="tab-button active" onclick="showPanel('sprites')">Sprites</button>
+                <button class="tab-button" onclick="showPanel('properties')">Properties</button>
+                <button class="tab-button" onclick="showPanel('code')">Code</button>
             </div>
-            <div id="codeOutput"></div>
+            <div id="spritePanel" class="sprite-panel">
+                <h3>Sprites</h3>
+                <div class="sprite-list" id="spriteList"></div>
+            </div>
+            <div id="propertiesPanel" class="properties-panel" style="display: none">
+                <div class="property-group">
+                    <label class="property-label">Position X</label>
+                    <input type="number" class="property-input" id="posX">
+                </div>
+                <div class="property-group">
+                    <label class="property-label">Position Y</label>
+                    <input type="number" class="property-input" id="posY">
+                </div>
+                <div class="property-group">
+                    <label class="property-label">Rotation</label>
+                    <input type="number" class="property-input" id="rotation">
+                </div>
+                <div class="property-group">
+                    <label class="property-label">Scale</label>
+                    <input type="number" class="property-input" id="scale" min="0.1" step="0.1">
+                </div>
+            </div>
+            <div id="codePanel" style="display: none">
+                <div id="codeOutput"></div>
+            </div>
         </div>
     </div>
+<!-- Add this XML toolbox definition to the previous HTML file, before the closing body tag -->
+<xml id="toolbox" style="display: none">
+    <!-- Events Category -->
+    <category name="Events" colour="#FFD700">
+        <block type="event_game_start"></block>
+        <block type="event_sprite_clicked"></block>
+        <block type="event_key_pressed">
+            <field name="KEY">space</field>
+        </block>
+        <block type="event_collision"></block>
+        <block type="event_timer"></block>
+    </category>
 
-    <xml id="toolbox" style="display: none">
-        <category name="Events" colour="#FFD700">
-            <block type="event_game_start"></block>
-            <block type="event_sprite_clicked"></block>
-            <block type="event_key_pressed"></block>
-        </category>
-        <category name="Motion" colour="#4C97FF">
-            <block type="motion_move_steps">
-                <value name="STEPS">
-                    <shadow type="math_number">
-                        <field name="NUM">10</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="motion_goto_xy">
-                <value name="X">
-                    <shadow type="math_number">
-                        <field name="NUM">0</field>
-                    </shadow>
-                </value>
-                <value name="Y">
-                    <shadow type="math_number">
-                        <field name="NUM">0</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="motion_rotate"></block>
-        </category>
-        <category name="Looks" colour="#9966FF">
-            <block type="looks_say">
-                <value name="MESSAGE">
-                    <shadow type="text">
-                        <field name="TEXT">Hello!</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="looks_change_costume"></block>
-            <block type="looks_set_size">
-                <value name="SIZE">
-                    <shadow type="math_number">
-                        <field name="NUM">100</field>
-                    </shadow>
-                </value>
-            </block>
-        </category>
-        <category name="Control" colour="#FF8C1A">
-            <block type="control_repeat">
-                <value name="TIMES">
-                    <shadow type="math_number">
-                        <field name="NUM">10</field>
-                    </shadow>
-                </value>
-            </block>
-            <block type="control_if"></block>
-            <block type="control_wait">
-                <value name="DURATION">
-                    <shadow type="math_number">
-                        <field name="NUM">1</field>
-                    </shadow>
-                </value>
-            </block>
-        </category>
-        <category name="Physics" colour="#FF6680">
-            <block type="physics_apply_force"></block>
-            <block type="physics_set_gravity"></block>
-            <block type="physics_set_collision"></block>
-        </category>
-        <category name="Variables" custom="VARIABLE" colour="#FF8C1A"></category>
-        <category name="Game" colour="#FF4F4F">
-            <block type="game_score"></block>
-            <block type="game_level"></block>
-            <block type="game_reset"></block>
-        </category>
-    </xml>
+    <!-- Motion Category -->
+    <category name="Motion" colour="#4C97FF">
+        <block type="motion_move_steps">
+            <value name="STEPS">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="motion_goto_xy">
+            <value name="X">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="Y">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="motion_rotate_by">
+            <value name="ANGLE">
+                <shadow type="math_number">
+                    <field name="NUM">15</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="motion_set_rotation_style"></block>
+        <block type="motion_point_towards"></block>
+        <block type="motion_set_velocity">
+            <value name="X">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="Y">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+    </category>
 
-    <script>
-        // Initialize game engine
-        const engine = Matter.Engine.create();
-        const world = engine.world;
-        const render = Matter.Render.create({
-            canvas: document.getElementById('gameCanvas'),
-            engine: engine,
-            options: {
-                width: 400,
-                height: 300,
-                wireframes: false,
-                background: '#000'
+    <!-- Looks Category -->
+    <category name="Looks" colour="#9966FF">
+        <block type="looks_say">
+            <value name="MESSAGE">
+                <shadow type="text">
+                    <field name="TEXT">Hello!</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="looks_change_costume"></block>
+        <block type="looks_next_costume"></block>
+        <block type="looks_set_size">
+            <value name="SIZE">
+                <shadow type="math_number">
+                    <field name="NUM">100</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="looks_show"></block>
+        <block type="looks_hide"></block>
+        <block type="looks_set_effect">
+            <value name="VALUE">
+                <shadow type="math_number">
+                    <field name="NUM">25</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="looks_clear_effects"></block>
+    </category>
+
+    <!-- Control Category -->
+    <category name="Control" colour="#FF8C1A">
+        <block type="control_wait">
+            <value name="DURATION">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="control_repeat">
+            <value name="TIMES">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="control_forever"></block>
+        <block type="control_if"></block>
+        <block type="control_if_else"></block>
+        <block type="control_wait_until"></block>
+        <block type="control_stop"></block>
+        <block type="control_create_clone"></block>
+    </category>
+
+    <!-- Physics Category -->
+    <category name="Physics" colour="#FF6680">
+        <block type="physics_apply_force">
+            <value name="FORCE_X">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="FORCE_Y">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="physics_set_gravity">
+            <value name="GRAVITY">
+                <shadow type="math_number">
+                    <field name="NUM">9.8</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="physics_set_friction">
+            <value name="FRICTION">
+                <shadow type="math_number">
+                    <field name="NUM">0.1</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="physics_set_bounce">
+            <value name="BOUNCE">
+                <shadow type="math_number">
+                    <field name="NUM">0.5</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="physics_set_fixed_rotation"></block>
+        <block type="physics_set_sensor"></block>
+    </category>
+
+    <!-- Roblox-specific Category -->
+    <category name="Roblox" colour="#FF4F4F">
+        <block type="roblox_create_part">
+            <field name="PART_TYPE">Block</field>
+        </block>
+        <block type="roblox_set_material">
+            <field name="MATERIAL">Plastic</field>
+        </block>
+        <block type="roblox_set_transparency">
+            <value name="TRANSPARENCY">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="roblox_tween_position"></block>
+        <block type="roblox_spawn_particle"></block>
+        <block type="roblox_play_sound"></block>
+    </category>
+
+    <!-- Game Category -->
+    <category name="Game" colour="#FF8C1A">
+        <block type="game_set_score">
+            <value name="SCORE">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="game_change_score">
+            <value name="CHANGE">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="game_set_level">
+            <value name="LEVEL">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="game_reset"></block>
+        <block type="game_end"></block>
+    </category>
+
+    <!-- Variables Category -->
+    <category name="Variables" colour="#FF8C1A" custom="VARIABLE"></category>
+
+    <!-- Lists Category -->
+    <category name="Lists" colour="#FF8C1A" custom="LIST"></category>
+
+    <!-- Sensing Category -->
+    <category name="Sensing" colour="#4CBFE6">
+        <block type="sensing_touching"></block>
+        <block type="sensing_touching_color"></block>
+        <block type="sensing_distance_to"></block>
+        <block type="sensing_ask">
+            <value name="QUESTION">
+                <shadow type="text">
+                    <field name="TEXT">What's your name?</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="sensing_mouse_down"></block>
+        <block type="sensing_mouse_x"></block>
+        <block type="sensing_mouse_y"></block>
+        <block type="sensing_timer"></block>
+        <block type="sensing_reset_timer"></block>
+    </category>
+
+    <!-- Operators Category -->
+    <category name="Operators" colour="#40BF4A">
+        <block type="operator_add">
+            <value name="NUM1">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+            <value name="NUM2">
+                <shadow type="math_number">
+                    <field name="NUM">0</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="operator_subtract"></block>
+        <block type="operator_multiply"></block>
+        <block type="operator_divide"></block>
+        <block type="operator_random">
+            <value name="FROM">
+                <shadow type="math_number">
+                    <field name="NUM">1</field>
+                </shadow>
+            </value>
+            <value name="TO">
+                <shadow type="math_number">
+                    <field name="NUM">10</field>
+                </shadow>
+            </value>
+        </block>
+        <block type="operator_gt"></block>
+        <block type="operator_lt"></block>
+        <block type="operator_equals"></block>
+        <block type="operator_and"></block>
+        <block type="operator_or"></block>
+        <block type="operator_not"></block>
+        <block type="operator_join"></block>
+        <block type="operator_letter_of"></block>
+        <block type="operator_length"></block>
+        <block type="operator_contains"></block>
+        <block type="operator_mod"></block>
+        <block type="operator_round"></block>
+        <block type="operator_mathop"></block>
+    </category>
+</xml>
+
+<!-- Add this script section after the toolbox XML in the previous file -->
+<script>
+// Event Blocks
+Blockly.Blocks['event_game_start'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("when game starts");
+        this.setNextStatement(true, null);
+        this.setColour('#FFD700');
+        this.setTooltip("Runs when the game begins");
+    }
+};
+
+Blockly.Blocks['event_sprite_clicked'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("when this sprite clicked");
+        this.setNextStatement(true, null);
+        this.setColour('#FFD700');
+        this.setTooltip("Runs when this sprite is clicked");
+    }
+};
+
+Blockly.Blocks['event_key_pressed'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("when key")
+            .appendField(new Blockly.FieldDropdown([
+                ["space", "space"],
+                ["up arrow", "up"],
+                ["down arrow", "down"],
+                ["left arrow", "left"],
+                ["right arrow", "right"],
+                ["enter", "enter"]
+            ]), "KEY")
+            .appendField("pressed");
+        this.setNextStatement(true, null);
+        this.setColour('#FFD700');
+        this.setTooltip("Runs when the specified key is pressed");
+    }
+};
+
+// Motion Blocks
+Blockly.Blocks['motion_move_steps'] = {
+    init: function() {
+        this.appendValueInput("STEPS")
+            .setCheck("Number")
+            .appendField("move")
+            .appendField(new Blockly.FieldNumber(10), "STEPS")
+            .appendField("steps");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour('#4C97FF');
+        this.setTooltip("Moves the sprite forward by the specified number of steps");
+    }
+};
+
+Blockly.Blocks['motion_goto_xy'] = {
+    init: function() {
+        this.appendValueInput("X")
+            .setCheck("Number")
+            .appendField("go to x:");
+        this.appendValueInput("Y")
+            .setCheck("Number")
+            .appendField("y:");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour('#4C97FF');
+        this.setTooltip("Moves the sprite to the specified x and y position");
+    }
+};
+
+// Physics Blocks
+Blockly.Blocks['physics_apply_force'] = {
+    init: function() {
+        this.appendValueInput("FORCE_X")
+            .setCheck("Number")
+            .appendField("apply force x:");
+        this.appendValueInput("FORCE_Y")
+            .setCheck("Number")
+            .appendField("y:");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour('#FF6680');
+        this.setTooltip("Applies a force to the sprite");
+    }
+};
+
+Blockly.Blocks['physics_set_gravity'] = {
+    init: function() {
+        this.appendValueInput("GRAVITY")
+            .setCheck("Number")
+            .appendField("set gravity to");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour('#FF6680');
+        this.setTooltip("Sets the gravity value for the game");
+    }
+};
+
+// Roblox-specific Blocks
+Blockly.Blocks['roblox_create_part'] = {
+    init: function() {
+        this.appendDummyInput()
+            .appendField("create")
+            .appendField(new Blockly.FieldDropdown([
+                ["Block", "Block"],
+                ["Sphere", "Sphere"],
+                ["Cylinder", "Cylinder"],
+                ["Wedge", "Wedge"]
+            ]), "PART_TYPE")
+            .appendField("part");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour('#FF4F4F');
+        this.setTooltip("Creates a new part with the specified shape");
+    }
+};
+
+// Game Blocks
+Blockly.Blocks['game_set_score'] = {
+    init: function() {
+        this.appendValueInput("SCORE")
+            .setCheck("Number")
+            .appendField("set score to");
+        this.setPreviousStatement(true, null);
+        this.setNextStatement(true, null);
+        this.setColour('#FF8C1A');
+        this.setTooltip("Sets the game score to the specified value");
+    }
+};
+
+// Lua Code Generators
+Blockly.Lua['event_game_start'] = function(block) {
+    return 'function onGameStart()\n';
+};
+
+Blockly.Lua['event_sprite_clicked'] = function(block) {
+    return 'function onSpriteClicked()\n';
+};
+
+Blockly.Lua['event_key_pressed'] = function(block) {
+    const key = block.getFieldValue('KEY');
+    return `function onKeyPressed_${key}()\n`;
+};
+
+Blockly.Lua['motion_move_steps'] = function(block) {
+    const steps = Blockly.Lua.valueToCode(block, 'STEPS', Blockly.Lua.ORDER_ATOMIC) || '0';
+    return `moveSteps(${steps})\n`;
+};
+
+Blockly.Lua['motion_goto_xy'] = function(block) {
+    const x = Blockly.Lua.valueToCode(block, 'X', Blockly.Lua.ORDER_ATOMIC) || '0';
+    const y = Blockly.Lua.valueToCode(block, 'Y', Blockly.Lua.ORDER_ATOMIC) || '0';
+    return `gotoXY(${x}, ${y})\n`;
+};
+
+Blockly.Lua['physics_apply_force'] = function(block) {
+    const forceX = Blockly.Lua.valueToCode(block, 'FORCE_X', Blockly.Lua.ORDER_ATOMIC) || '0';
+    const forceY = Blockly.Lua.valueToCode(block, 'FORCE_Y', Blockly.Lua.ORDER_ATOMIC) || '0';
+    return `applyForce(${forceX}, ${forceY})\n`;
+};
+
+Blockly.Lua['physics_set_gravity'] = function(block) {
+    const gravity = Blockly.Lua.valueToCode(block, 'GRAVITY', Blockly.Lua.ORDER_ATOMIC) || '9.8';
+    return `setGravity(${gravity})\n`;
+};
+
+Blockly.Lua['roblox_create_part'] = function(block) {
+    const partType = block.getFieldValue('PART_TYPE');
+    return `local part = Instance.new("${partType}")\n`;
+};
+
+Blockly.Lua['game_set_score'] = function(block) {
+    const score = Blockly.Lua.valueToCode(block, 'SCORE', Blockly.Lua.ORDER_ATOMIC) || '0';
+    return `setScore(${score})\n`;
+};
+
+// Game state management
+const gameState = {
+    score: 0,
+    running: false,
+    sprites: [],
+    selectedSprite: null
+};
+
+// Game functions
+function runGame() {
+    gameState.running = true;
+    const code = Blockly.Lua.workspaceToCode(workspace);
+    document.getElementById('codeOutput').textContent = code;
+    // Execute game logic
+}
+
+function pauseGame() {
+    gameState.running = false;
+}
+
+function stopGame() {
+    gameState.running = false;
+    resetGame();
+}
+
+function resetGame() {
+    gameState.score = 0;
+    gameState.running = false;
+    // Reset all sprites to initial positions
+    updateGameDisplay();
+}
+
+function addSprite() {
+    const sprite = {
+        id: Date.now(),
+        name: `Sprite ${gameState.sprites.length + 1}`,
+        x: 200,
+        y: 150,
+        rotation: 0,
+        scale: 1,
+        body: Matter.Bodies.rectangle(200, 150, 30, 30, {
+            render: {
+                fillStyle: '#F35e66'
             }
-        });
+        })
+    };
+    
+    Matter.World.add(engine.world, sprite.body);
+    gameState.sprites.push(sprite);
+    updateSpriteList();
+}
 
-        Matter.Render.run(render);
-        const runner = Matter.Runner.create();
-        Matter.Runner.run(runner, engine);
+function updateSpriteList() {
+    const spriteList = document.getElementById('spriteList');
+    spriteList.innerHTML = gameState.sprites.map(sprite => `
+        <div class="sprite-item" onclick="selectSprite(${sprite.id})">
+            <span>${sprite.name}</span>
+            <button onclick="deleteSprite(${sprite.id})">🗑️</button>
+        </div>
+    `).join('');
+}
 
-        // Game state
-        const gameState = {
-            sprites: [],
-            running: false,
-            score: 0,
-            level: 1
-        };
+function selectSprite(id) {
+    gameState.selectedSprite = gameState.sprites.find(s => s.id === id);
+    updatePropertyPanel();
+}
 
-        // Initialize Blockly
-        const workspace = Blockly.inject('blocklyDiv', {
-            toolbox: document.getElementById('toolbox'),
-            grid: {
-                spacing: 20,
-                length: 3,
-                colour: '#ccc',
-                snap: true
-            },
-            zoom: {
-                controls: true,
-                wheel: true,
-                startScale: 1.0,
-                maxScale: 3,
-                minScale: 0.3,
-                scaleSpeed: 1.2
-            },
-            trashcan: true
-        });
+function deleteSprite(id) {
+    const index = gameState.sprites.findIndex(s => s.id === id);
+    if (index > -1) {
+        Matter.World.remove(engine.world, gameState.sprites[index].body);
+        gameState.sprites.splice(index, 1);
+        updateSpriteList();
+    }
+}
 
-        // Custom block definitions
-        Blockly.Blocks['event_game_start'] = {
-            init: function() {
-                this.appendDummyInput()
-                    .appendField("when game starts");
-                this.setNextStatement(true, null);
-                this.setColour('#FFD700');
-            }
-        };
+function updatePropertyPanel() {
+    if (!gameState.selectedSprite) return;
+    
+    document.getElementById('posX').value = gameState.selectedSprite.x;
+    document.getElementById('posY').value = gameState.selectedSprite.y;
+    document.getElementById('rotation').value = gameState.selectedSprite.rotation;
+    document.getElementById('scale').value = gameState.selectedSprite.scale;
+}
 
-        Blockly.Blocks['event_sprite_clicked'] = {
-            init: function() {
-                this.appendDummyInput()
-                    .appendField("when sprite clicked");
-                this.setNextStatement(true, null);
-                this.setColour('#FFD700');
-            }
-        };
+function showPanel(panelName) {
+    const panels = ['spritePanel', 'propertiesPanel', 'codePanel'];
+    panels.forEach(panel => {
+        document.getElementById(panel).style.display = panel === panelName + 'Panel' ? 'block' : 'none';
+    });
+    
+    const buttons = document.querySelectorAll('.tab-button');
+    buttons.forEach(button => {
+        button.classList.toggle('active', button.innerText.toLowerCase().includes(panelName));
+    });
+}
 
-        Blockly.Blocks['motion_move_steps'] = {
-            init: function() {
-                this.appendValueInput("STEPS")
-                    .setCheck("Number")
-                    .appendField("move")
-                    .appendField(new Blockly.FieldNumber(10), "STEPS")
-                    .appendField("steps");
-                this.setPreviousStatement(true, null);
-                this.setNextStatement(true, null);
-                this.setColour('#4C97FF');
-            }
-        };
+// Initialize the workspace with custom blocks
+function initWorkspace() {
+    // Add any additional initialization here
+}
 
-        // Add more block definitions here...
-
-        // Game functions
-        function runGame() {
-            gameState.running = true;
-            const code = Blockly.Lua.workspaceToCode(workspace);
-            document.getElementById('codeOutput').textContent = code;
-            // Execute game logic here
-        }
-
-        function stopGame() {
-            gameState.running = false;
-            // Stop game logic here
-        }
-
-        function addSprite() {
-            const sprite = {
-                id: Date.now(),
-                name: `Sprite ${gameState.sprites.length + 1}`,
-                x: 200,
-                y: 150,
-                body: Matter.Bodies.rectangle(200, 150, 30, 30, {
-                    render: {
-                        fillStyle: '#F35e66'
-                    }
-                })
-            };
-
-            Matter.World.add(world, sprite.body);
-            gameState.sprites.push(sprite);
-            updateSpriteList();
-        }
-
-        function updateSpriteList() {
-            const spriteList = document.getElementById('spriteList');
-            spriteList.innerHTML = gameState.sprites.map(sprite => `
-                <div class="sprite-item" onclick="selectSprite(${sprite.id})">
-                    ${sprite.name}
-                </div>
-            `).join('');
-        }
-
-        function selectSprite(id) {
-            const sprite = gameState.sprites.find(s => s.id === id);
-            // Show sprite properties
-            console.log('Selected sprite:', sprite);
-        }
-
-        function switchTab(element, tab) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            element.classList.add('active');
-            // Switch tab content
-        }
-
-        function saveProject() {
-            const projectData = {
-                blocks: Blockly.serialization.workspaces.save(workspace),
-                sprites: gameState.sprites
-            };
-            const blob = new Blob([JSON.stringify(projectData)], {type: 'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'game-project.json';
-            a.click();
-        }
-
-        function loadProject() {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
-            input.onchange = e => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = event => {
-                    const projectData = JSON.parse(event.target.result);
-                    Blockly.serialization.workspaces.load(projectData.blocks, workspace);
-                    gameState.sprites = projectData.sprites;
-                    updateSpriteList();
-                };
-                reader.readAsText(file);
-            };
-            input.click();
-        }
-
-        // Initialize the game
-        function init() {
-            // Add ground
-            const ground = Matter.Bodies.rectangle(200, 290, 400, 20, {
-                isStatic: true,
-                render: {
-                    fillStyle: '#666'
-                }
-            });
-            Matter.World.add(world, ground);
-        }
-
-        init();
-    </script>
+// Call initialization when the page loads
+window.onload = function() {
+    initWorkspace();
+};
+</script>
 </body>
 </html>
